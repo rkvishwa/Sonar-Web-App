@@ -57,6 +57,7 @@
     ></div>
   </div>
 
+  {#if !page.url.pathname.startsWith("/admin")}
   <header class="fixed top-0 z-100 w-full px-4 pt-3 sm:px-6">
     <div
       class="header-shell relative mx-auto w-full max-w-300 rounded-2xl border border-cyan-400/30 dark:border-cyan-400/20 bg-[#e9f3ff]/78 dark:bg-[#040a16]/94 shadow-[0_18px_46px_-24px_rgba(3,40,58,0.45)] dark:shadow-[0_18px_46px_-24px_rgba(2,12,27,0.9)] backdrop-blur-xl transition-[background-color,border-color,box-shadow] duration-200"
@@ -115,6 +116,15 @@
               class={`absolute left-0 -bottom-1 h-0.5 rounded-full bg-linear-to-r from-cyan-500 to-blue-500 transition-all ${isActive("/contact") ? "w-full opacity-100" : "w-0 opacity-0"}`}
             ></span>
           </a>
+          <a
+            href="/admin/signin"
+            class={`relative pb-1 transition-colors ${navLinkClass("/admin")}`}
+          >
+            Host Portal
+            <span
+              class={`absolute left-0 -bottom-1 h-0.5 rounded-full bg-linear-to-r from-cyan-500 to-blue-500 transition-all ${isActive("/admin") ? "w-full opacity-100" : "w-0 opacity-0"}`}
+            ></span>
+          </a>
         </nav>
 
         <div class="flex items-center space-x-2 sm:space-x-3">
@@ -160,6 +170,7 @@
             <a href="/docs" class={navLinkClass("/docs")}>Documentation</a>
             <a href="/about" class={navLinkClass("/about")}>About</a>
             <a href="/contact" class={navLinkClass("/contact")}>Contact Us</a>
+            <a href="/admin/signin" class={navLinkClass("/admin")}>Host Portal</a>
           </nav>
           <div class="flex items-center gap-3 pt-4 border-t border-cyan-400/20">
             <ThemeToggle />
@@ -184,8 +195,9 @@
       {/if}
     </div>
   </header>
+  {/if}
 
-  <main class="relative z-10 flex-1 flex flex-col pt-12">
+  <main class={`relative z-10 flex-1 flex flex-col ${!page.url.pathname.startsWith("/admin") ? "pt-12" : ""}`}>
     {#key page.url.pathname}
       <div class="page-load-smooth">
         {@render children()}
@@ -193,10 +205,11 @@
     {/key}
   </main>
 
-  <footer
-    class="relative z-10 mt-auto border-t border-zinc-200/70 dark:border-white/8 pt-16 pb-8 bg-white/60 dark:bg-[#0d1520]/72 text-zinc-500 dark:text-zinc-400 backdrop-blur-xl transition-colors duration-200"
-  >
-    <div class="container mx-auto px-6 max-w-300">
+  {#if !page.url.pathname.startsWith("/admin")}
+    <footer
+      class="relative z-10 mt-auto border-t border-zinc-200/70 dark:border-white/8 pt-16 pb-8 bg-white/60 dark:bg-[#0d1520]/72 text-zinc-500 dark:text-zinc-400 backdrop-blur-xl transition-colors duration-200"
+    >
+      <div class="container mx-auto px-6 max-w-300">
       <div
         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16"
       >
@@ -356,6 +369,7 @@
           <span>POWERED BY KNURDZ</span>
         </a>
       </div>
-    </div>
-  </footer>
+      </div>
+    </footer>
+  {/if}
 </div>

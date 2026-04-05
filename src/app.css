@@ -19,6 +19,28 @@ body {
   font-family: var(--font-sans);
 }
 
+/* Ensure all interactive elements have a pointer cursor */
+button,
+[role="button"],
+a,
+select,
+summary,
+input[type="submit"],
+input[type="button"],
+input[type="checkbox"],
+input[type="radio"],
+label {
+  cursor: pointer;
+}
+
+/* Explicitly for elements that might be disabled */
+button:disabled,
+[role="button"]:disabled,
+input:disabled,
+label:disabled {
+  cursor: not-allowed;
+}
+
 .page-load-smooth {
   animation: page-load-smooth 420ms cubic-bezier(0.16, 1, 0.3, 1) both;
   will-change: opacity, transform;
