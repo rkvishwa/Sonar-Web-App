@@ -10,6 +10,7 @@
     Copy,
     FileText,
     Flag,
+    Link2,
     LoaderCircle,
     RefreshCw,
     Settings,
@@ -28,6 +29,7 @@
     statusTone,
   } from "$lib/admin/hostDashboard";
   import { formatDateTime } from "$lib/admin/analytics";
+  import { buildHackathonEditorInviteUrl } from "$lib/admin/inviteLinks";
 
   let currentUser = $state<HostAccount | null>(null);
   let snapshot = $state<AdminSnapshot>(emptySnapshot);
@@ -39,6 +41,7 @@
   let dashboardError = $state("");
   let activeHackathonKey = "";
   let copiedId = $state("");
+  let copiedInviteId = $state("");
 
   function liveTeams() {
     return snapshot.monitors.filter((entry) => entry.status === "online");
@@ -101,6 +104,18 @@
       setTimeout(() => {
         if (copiedId === text) {
           copiedId = "";
+        }
+      }, 2000);
+    });
+  }
+
+  function copyEditorInvite(hackathonId: string) {
+    const inviteUrl = buildHackathonEditorInviteUrl(hackathonId);
+    navigator.clipboard.writeText(inviteUrl).then(() => {
+      copiedInviteId = hackathonId;
+      setTimeout(() => {
+        if (copiedInviteId === hackathonId) {
+          copiedInviteId = "";
         }
       }, 2000);
     });
@@ -269,6 +284,20 @@
                   {/if}
                 </button>
              </div>
+             <button
+               type="button"
+               onclick={() => copyEditorInvite(hackathon.hackathonId)}
+               class="mt-2 inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
+             >
+               {#if copiedInviteId === hackathon.hackathonId}
+                 <Check size={12} class="text-emerald-500" />
+               {:else}
+                 <Link2 size={12} />
+               {/if}
+               {copiedInviteId === hackathon.hackathonId
+                 ? "Link copied"
+                 : "Copy Invitation Link"}
+             </button>
           </div>
           <div class="hidden h-10 w-px bg-zinc-200 dark:bg-zinc-800 sm:block"></div>
           <div class="flex flex-col gap-1.5">

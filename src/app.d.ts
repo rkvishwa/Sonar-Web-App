@@ -13,6 +13,7 @@ declare global {
 		readonly VITE_APPWRITE_FUNCTION_SETTINGS?: string;
 		readonly VITE_DEV_KEY?: string;
 		readonly VITE_APPWRITE_DEV_KEY?: string;
+		readonly VITE_SONAR_WEBSITE_URL?: string;
 	}
 
 	interface ImportMeta {

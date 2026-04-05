@@ -10,12 +10,41 @@
   import Terminal from "lucide-svelte/icons/terminal";
 
   type ClientOS = "windows" | "mac" | "other";
+  type InviteMode = "team" | "hackathon" | null;
 
   let clientOS = $state<ClientOS>("other");
   let linkCopied = $state(false);
   let updateLinkCopied = $state(false);
+  let inviteMode = $state<InviteMode>(null);
+  let inviteHackathonId = $state("");
+  let inviteStudentId = $state("");
+  let deepLinkUrl = $state("");
+  let inviteStatus = $state<"idle" | "opening" | "fallback">("idle");
   const macInstallCommand = "brew install --cask rkvishwa/knurdz/sonar-code-editor";
   const macUpdateCommand = "brew upgrade --cask rkvishwa/knurdz/sonar-code-editor";
+
+  function openEditorInvite() {
+    if (!deepLinkUrl || typeof document === "undefined") {
+      return;
+    }
+
+    inviteStatus = "opening";
+
+    const probe = document.createElement("iframe");
+    probe.style.display = "none";
+    probe.src = deepLinkUrl;
+    document.body.appendChild(probe);
+
+    window.setTimeout(() => {
+      probe.remove();
+    }, 1200);
+
+    window.setTimeout(() => {
+      if (document.visibilityState === "visible") {
+        inviteStatus = "fallback";
+      }
+    }, 1600);
+  }
 
   function copyMacLink() {
     navigator.clipboard.writeText(macInstallCommand).then(() => {
@@ -44,6 +73,27 @@
     } else {
       clientOS = "other";
     }
+
+    const params = new URLSearchParams(window.location.search);
+    const encryptedInvite = params.get("invite")?.trim() || "";
+    const hackathonId = (params.get("hackathonId") || "").replace(/\D+/g, "");
+    const studentId = (params.get("studentId") || "").trim().toUpperCase();
+
+    if (encryptedInvite) {
+      inviteMode = "team";
+      deepLinkUrl = `sonar-editor://auth?invite=${encodeURIComponent(encryptedInvite)}`;
+      openEditorInvite();
+    } else if (hackathonId) {
+      inviteMode = "hackathon";
+      inviteHackathonId = hackathonId;
+      inviteStudentId = studentId;
+      deepLinkUrl =
+        `sonar-editor://auth?hackathonId=${encodeURIComponent(hackathonId)}` +
+        (studentId
+          ? `&studentId=${encodeURIComponent(studentId)}`
+          : "");
+      openEditorInvite();
+    }
   });
 </script>
 
@@ -60,6 +110,65 @@
 <div
   class="px-6 py-20 lg:py-32 max-w-4xl mx-auto w-full text-center transition-colors duration-200"
 >
+  {#if inviteMode}
+    <div class="mb-8 rounded-3xl border border-cyan-200/70 bg-cyan-50/80 p-6 text-left shadow-sm dark:border-cyan-500/20 dark:bg-cyan-500/10">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div class="max-w-2xl">
+          <p class="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-700 dark:text-cyan-300">
+            Invite Link
+          </p>
+          <h2 class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
+            {inviteStatus === "opening"
+              ? "Opening Sonar IDE..."
+              : "Install Sonar IDE to continue"}
+          </h2>
+          <p class="mt-3 text-sm leading-6 text-zinc-700 dark:text-zinc-300">
+            {#if inviteMode === "team"}
+              This invite will open the desktop app and sign you in automatically.
+            {:else if inviteStudentId}
+              This invite will open the desktop app with hackathon ID
+              <strong class="font-mono text-zinc-900 dark:text-white">
+                {inviteHackathonId}
+              </strong>
+              and student ID
+              <strong class="font-mono text-zinc-900 dark:text-white">
+                {inviteStudentId}
+              </strong>
+              prefilled. The invited user still needs to enter the password manually.
+            {:else}
+              This invite will open the desktop app with hackathon ID
+              <strong class="font-mono text-zinc-900 dark:text-white">
+                {inviteHackathonId}
+              </strong>
+              prefilled on the login screen.
+            {/if}
+            {#if inviteStatus === "fallback"}
+              If nothing opened yet, download the app below and try the invite again.
+            {/if}
+          </p>
+        </div>
+
+        <div class="flex flex-col gap-3 sm:min-w-[210px]">
+          <button
+            type="button"
+            onclick={openEditorInvite}
+            class="inline-flex items-center justify-center gap-2 rounded-xl bg-zinc-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-100"
+          >
+            <Link2 size={16} />
+            Open Sonar IDE
+          </button>
+          <a
+            href="/download"
+            class="inline-flex items-center justify-center gap-2 rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200 dark:hover:bg-zinc-800"
+          >
+            <Download size={16} />
+            Go to Download Page
+          </a>
+        </div>
+      </div>
+    </div>
+  {/if}
+
   <div
     class="w-20 h-20 bg-blue-100 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-lg shadow-blue-500/20"
   >
