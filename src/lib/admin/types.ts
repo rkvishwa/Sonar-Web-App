@@ -1,12 +1,32 @@
 export type AccountRole = "host" | "admin";
+export type HostAccountType = "individual" | "organization";
+export type HostAuthProvider = "email" | "google" | "github";
+
+export interface HostAccountPrefs extends Record<string, unknown> {
+  role?: AccountRole;
+  registrationCompleted?: boolean;
+  registrationCompletedAt?: string;
+  accountType?: HostAccountType;
+  organizationName?: string;
+  registrantRole?: string;
+  passwordConfigured?: boolean;
+  authProviders?: HostAuthProvider[];
+}
 
 export interface HostAccount {
   id: string;
   name: string;
   email: string;
+  emailVerified: boolean;
   role: AccountRole;
   labels: string[];
-  prefs: Record<string, unknown>;
+  prefs: HostAccountPrefs;
+  registrationCompleted: boolean;
+  accountType: HostAccountType | null;
+  organizationName: string | null;
+  registrantRole: string | null;
+  passwordConfigured: boolean;
+  authProviders: HostAuthProvider[];
   createdAt?: string;
 }
 
@@ -15,6 +35,9 @@ export type HackathonStatus = "draft" | "live" | "archived";
 export interface HackathonSettings {
   blockInternetAccess: boolean;
   blockNonEmptyWorkspace: boolean;
+  accentColor?: string;
+  editorTheme?: "system" | "light" | "dark";
+  analyticsVisibility?: "hosts" | "organizers" | "readonly";
 }
 
 export interface GlobalSettings extends HackathonSettings {

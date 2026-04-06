@@ -1,9 +1,13 @@
 import {
+  DASHBOARD_PATH,
+  resolveAuthenticatedRoute,
+  refreshSession,
+} from "$lib/admin/auth";
+import {
   defaultGlobalSettings,
   listHackathons,
   loadAdminSnapshot,
 } from "$lib/admin/api";
-import { refreshSession } from "$lib/admin/auth";
 import type {
   AdminSnapshot,
   HackathonRecord,
@@ -29,6 +33,20 @@ export const emptySnapshot: AdminSnapshot = {
   },
 };
 
+export class AuthRedirectRequiredError extends Error {
+  target: string;
+
+  constructor(target: string) {
+    super("Authentication flow requires a redirect before opening the dashboard.");
+    this.name = "AuthRedirectRequiredError";
+    this.target = target;
+  }
+}
+
+export function isAuthRedirectRequiredError(value: unknown): value is AuthRedirectRequiredError {
+  return value instanceof AuthRedirectRequiredError;
+}
+
 export interface HostWorkspaceData {
   currentUser: HostAccount;
   snapshot: AdminSnapshot;
@@ -45,6 +63,11 @@ export async function loadHostWorkspace(): Promise<HostWorkspaceData | null> {
   const session = await refreshSession();
   if (!session.user) {
     return null;
+  }
+
+  const target = resolveAuthenticatedRoute(session.user);
+  if (target !== DASHBOARD_PATH) {
+    throw new AuthRedirectRequiredError(target);
   }
 
   const [hackathonResult, adminResult] = await Promise.all([

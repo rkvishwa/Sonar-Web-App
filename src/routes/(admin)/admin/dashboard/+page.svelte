@@ -41,6 +41,7 @@
   import {
     changeCurrentPassword,
     refreshSession,
+    resolveAuthenticatedRoute,
     signOut,
   } from "$lib/admin/auth";
   import {
@@ -60,6 +61,10 @@
     monitors: [],
     reports: [],
     settings: {
+      blockInternetAccess: false,
+      blockNonEmptyWorkspace: false,
+    },
+    globalSettings: {
       blockInternetAccess: false,
       blockNonEmptyWorkspace: false,
     },
@@ -213,8 +218,8 @@
 
     try {
       const session = await refreshSession();
-      if (!session.user) {
-        await goto("/admin/signin", { replaceState: true });
+      if (!session.user || !session.user.registrationCompleted) {
+        await goto(resolveAuthenticatedRoute(session.user), { replaceState: true });
         return;
       }
 

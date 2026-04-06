@@ -24,6 +24,7 @@
   import {
     buildHackathonRoute,
     emptySnapshot,
+    isAuthRedirectRequiredError,
     loadHackathonWorkspace,
     riskTone,
     statusTone,
@@ -88,6 +89,11 @@
       hackathon = data.hackathon;
       hackathonWarning = data.hackathonWarning;
     } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+        return;
+      }
+
       dashboardError =
         err instanceof Error
           ? err.message
@@ -274,7 +280,7 @@
                 <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100 font-mono">{hackathon.hackathonId}</p>
                 <button 
                   type="button"
-                  onclick={() => copyToClipboard(hackathon.hackathonId)}
+                  onclick={() => copyToClipboard(hackathon!.hackathonId)}
                   class="p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-600 transition-colors"
                 >
                   {#if copiedId === hackathon.hackathonId}
@@ -286,7 +292,7 @@
              </div>
              <button
                type="button"
-               onclick={() => copyEditorInvite(hackathon.hackathonId)}
+               onclick={() => copyEditorInvite(hackathon!.hackathonId)}
                class="mt-2 inline-flex items-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1.5 text-[11px] font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
              >
                {#if copiedInviteId === hackathon.hackathonId}

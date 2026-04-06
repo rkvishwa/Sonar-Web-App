@@ -22,6 +22,7 @@
   } from "$lib/admin/types";
   import {
     emptySnapshot,
+    isAuthRedirectRequiredError,
     loadHackathonWorkspace,
     riskTone,
     statusTone,
@@ -105,6 +106,11 @@
       hackathonWarning = data.hackathonWarning;
       syncSelectedTeam();
     } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+        return;
+      }
+
       dashboardError =
         err instanceof Error
           ? err.message

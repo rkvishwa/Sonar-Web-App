@@ -1,11 +1,11 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
-  import { refreshSession } from "$lib/admin/auth";
+  import { refreshSession, resolveAuthenticatedRoute } from "$lib/admin/auth";
 
   onMount(async () => {
     const session = await refreshSession();
-    await goto(session.user ? "/admin/dashboard" : "/admin/signin", {
+    await goto(resolveAuthenticatedRoute(session.user), {
       replaceState: true,
     });
   });

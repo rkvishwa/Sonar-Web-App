@@ -26,6 +26,7 @@
     buildHackathonRoute,
     cloneHackathon,
     emptySnapshot,
+    isAuthRedirectRequiredError,
     loadHackathonWorkspace,
   } from "$lib/admin/hostDashboard";
   import { formatDateTime } from "$lib/admin/analytics";
@@ -79,6 +80,11 @@
       hackathonEditor = cloneHackathon(data.hackathon);
       hackathonWarning = data.hackathonWarning;
     } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+        return;
+      }
+
       dashboardError =
         err instanceof Error
           ? err.message
@@ -432,13 +438,14 @@
                       <button
                         type="button"
                         role="switch"
-                        aria-checked={hackathonEditor.settings.blockInternetAccess}
-                        onclick={() => hackathonEditor.settings.blockInternetAccess = !hackathonEditor.settings.blockInternetAccess}
-                        class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${hackathonEditor.settings.blockInternetAccess ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                        aria-label="Toggle internet access restriction"
+                        aria-checked={hackathonEditor!.settings.blockInternetAccess}
+                        onclick={() => hackathonEditor!.settings.blockInternetAccess = !hackathonEditor!.settings.blockInternetAccess}
+                        class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${hackathonEditor!.settings.blockInternetAccess ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
                       >
                         <span
                           aria-hidden="true"
-                          class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${hackathonEditor.settings.blockInternetAccess ? 'translate-x-5' : 'translate-x-0'}`}
+                          class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${hackathonEditor!.settings.blockInternetAccess ? 'translate-x-5' : 'translate-x-0'}`}
                         ></span>
                       </button>
                     </div>
@@ -451,13 +458,14 @@
                       <button
                         type="button"
                         role="switch"
-                        aria-checked={hackathonEditor.settings.blockNonEmptyWorkspace}
-                        onclick={() => hackathonEditor.settings.blockNonEmptyWorkspace = !hackathonEditor.settings.blockNonEmptyWorkspace}
-                        class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${hackathonEditor.settings.blockNonEmptyWorkspace ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                        aria-label="Toggle empty workspace restriction"
+                        aria-checked={hackathonEditor!.settings.blockNonEmptyWorkspace}
+                        onclick={() => hackathonEditor!.settings.blockNonEmptyWorkspace = !hackathonEditor!.settings.blockNonEmptyWorkspace}
+                        class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${hackathonEditor!.settings.blockNonEmptyWorkspace ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
                       >
                         <span
                           aria-hidden="true"
-                          class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${hackathonEditor.settings.blockNonEmptyWorkspace ? 'translate-x-5' : 'translate-x-0'}`}
+                          class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${hackathonEditor!.settings.blockNonEmptyWorkspace ? 'translate-x-5' : 'translate-x-0'}`}
                         ></span>
                       </button>
                     </div>

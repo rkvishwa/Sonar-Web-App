@@ -27,6 +27,7 @@
   import {
     buildHackathonRoute,
     emptySnapshot,
+    isAuthRedirectRequiredError,
     loadHostWorkspace,
   } from "$lib/admin/hostDashboard";
   import { formatDateTime } from "$lib/admin/analytics";
@@ -101,6 +102,11 @@
       }
       hasHydratedGlobalDefaults = true;
     } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+        return;
+      }
+
       dashboardError =
         err instanceof Error
           ? err.message

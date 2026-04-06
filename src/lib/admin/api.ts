@@ -145,6 +145,9 @@ export function defaultHackathonSettings(): HackathonSettings {
   return {
     blockInternetAccess: true,
     blockNonEmptyWorkspace: true,
+    accentColor: "#4f46e5",
+    editorTheme: "system",
+    analyticsVisibility: "hosts",
   };
 }
 

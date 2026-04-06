@@ -12,7 +12,9 @@
     ShieldAlert,
   } from "lucide-svelte";
   import { updateGlobalSettings } from "$lib/admin/api";
-  import { changeCurrentPassword } from "$lib/admin/auth";
+  import {
+    changeCurrentPassword,
+  } from "$lib/admin/auth";
   import type {
     AdminSnapshot,
     GlobalSettings,
@@ -20,6 +22,7 @@
   } from "$lib/admin/types";
   import {
     emptySnapshot,
+    isAuthRedirectRequiredError,
     loadHostWorkspace,
     platformAccessLabel,
   } from "$lib/admin/hostDashboard";
@@ -70,6 +73,11 @@
       globalSettings = { ...data.snapshot.globalSettings };
       hostedHackathonCount = data.hackathons.length;
     } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+        return;
+      }
+
       dashboardError =
         err instanceof Error
           ? err.message
@@ -294,6 +302,7 @@
                     <button
                       type="button"
                       role="switch"
+                      aria-label="Toggle default internet restriction"
                       aria-checked={globalSettings.blockInternetAccess}
                       onclick={() => globalSettings.blockInternetAccess = !globalSettings.blockInternetAccess}
                       class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${globalSettings.blockInternetAccess ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
@@ -313,6 +322,7 @@
                     <button
                       type="button"
                       role="switch"
+                      aria-label="Toggle default empty workspace restriction"
                       aria-checked={globalSettings.blockNonEmptyWorkspace}
                       onclick={() => globalSettings.blockNonEmptyWorkspace = !globalSettings.blockNonEmptyWorkspace}
                       class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${globalSettings.blockNonEmptyWorkspace ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}

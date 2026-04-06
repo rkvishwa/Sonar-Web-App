@@ -1,7 +1,8 @@
 <script lang="ts">
   import "../app.css";
   import { page } from "$app/state";
-  import { Github, Download, Home, Menu, X, Zap } from "lucide-svelte";
+  import { Github, Download, Home, Menu, X, Zap, LayoutDashboard, LogIn } from "lucide-svelte";
+  import { auth } from "$lib/admin/auth";
   import ThemeToggle from "$lib/components/ThemeToggle.svelte";
   let { children } = $props();
 
@@ -25,6 +26,16 @@
     page.url.pathname;
     isMobileMenuOpen = false;
   });
+
+  let showMainLayout = $derived(
+    !page.url.pathname.startsWith("/admin") ||
+      page.url.pathname === "/admin/signin" ||
+      page.url.pathname === "/admin/signup" ||
+      page.url.pathname === "/admin/complete-registration" ||
+      page.url.pathname === "/admin/verify-email" ||
+      page.url.pathname === "/admin/forgot-password" ||
+      page.url.pathname === "/admin/reset-password"
+  );
 </script>
 
 <svelte:head>
@@ -57,7 +68,7 @@
     ></div>
   </div>
 
-  {#if !page.url.pathname.startsWith("/admin")}
+  {#if showMainLayout}
   <header class="fixed top-0 z-100 w-full px-4 pt-3 sm:px-6">
     <div
       class="header-shell relative mx-auto w-full max-w-300 rounded-2xl border border-cyan-400/30 dark:border-cyan-400/20 bg-[#e9f3ff]/78 dark:bg-[#040a16]/94 shadow-[0_18px_46px_-24px_rgba(3,40,58,0.45)] dark:shadow-[0_18px_46px_-24px_rgba(2,12,27,0.9)] backdrop-blur-xl transition-[background-color,border-color,box-shadow] duration-200"
@@ -116,15 +127,7 @@
               class={`absolute left-0 -bottom-1 h-0.5 rounded-full bg-linear-to-r from-cyan-500 to-blue-500 transition-all ${isActive("/contact") ? "w-full opacity-100" : "w-0 opacity-0"}`}
             ></span>
           </a>
-          <a
-            href="/admin/signin"
-            class={`relative pb-1 transition-colors ${navLinkClass("/admin")}`}
-          >
-            Host Portal
-            <span
-              class={`absolute left-0 -bottom-1 h-0.5 rounded-full bg-linear-to-r from-cyan-500 to-blue-500 transition-all ${isActive("/admin") ? "w-full opacity-100" : "w-0 opacity-0"}`}
-            ></span>
-          </a>
+
         </nav>
 
         <div class="flex items-center space-x-2 sm:space-x-3">
@@ -139,6 +142,27 @@
             >
               <Github size={18} />
             </a>
+            {#if $auth.user}
+              <a
+                href="/admin/dashboard"
+                class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 cursor-pointer"
+              >
+                <span class="inline-flex items-center space-x-2">
+                  <LayoutDashboard size={16} />
+                  <span>Dashboard</span>
+                </span>
+              </a>
+            {:else}
+              <a
+                href="/admin/signin"
+                class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 cursor-pointer"
+              >
+                <span class="inline-flex items-center space-x-2">
+                  <LogIn size={16} />
+                  <span>Sign In</span>
+                </span>
+              </a>
+            {/if}
             <a
               href="/download"
               class="rounded-full bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all hover:from-cyan-400 hover:to-blue-500 cursor-pointer"
@@ -170,7 +194,7 @@
             <a href="/docs" class={navLinkClass("/docs")}>Documentation</a>
             <a href="/about" class={navLinkClass("/about")}>About</a>
             <a href="/contact" class={navLinkClass("/contact")}>Contact Us</a>
-            <a href="/admin/signin" class={navLinkClass("/admin")}>Host Portal</a>
+
           </nav>
           <div class="flex items-center gap-3 pt-4 border-t border-cyan-400/20">
             <ThemeToggle />
@@ -183,6 +207,23 @@
             >
               <Github size={18} />
             </a>
+            {#if $auth.user}
+              <a
+                href="/admin/dashboard"
+                class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+              >
+                <LayoutDashboard size={16} />
+                <span>Dashboard</span>
+              </a>
+            {:else}
+              <a
+                href="/admin/signin"
+                class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+              >
+                <LogIn size={16} />
+                <span>Sign In</span>
+              </a>
+            {/if}
             <a
               href="/download"
               class="rounded-full bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all hover:from-cyan-400 hover:to-blue-500 flex-1 flex justify-center items-center gap-2 cursor-pointer"
@@ -197,7 +238,7 @@
   </header>
   {/if}
 
-  <main class={`relative z-10 flex-1 flex flex-col ${!page.url.pathname.startsWith("/admin") ? "pt-12" : ""}`}>
+  <main class={`relative z-10 flex-1 flex flex-col ${showMainLayout ? "pt-12" : ""}`}>
     {#key page.url.pathname}
       <div class="page-load-smooth">
         {@render children()}
@@ -205,7 +246,7 @@
     {/key}
   </main>
 
-  {#if !page.url.pathname.startsWith("/admin")}
+  {#if showMainLayout}
     <footer
       class="relative z-10 mt-auto border-t border-zinc-200/70 dark:border-white/8 pt-16 pb-8 bg-white/60 dark:bg-[#0d1520]/72 text-zinc-500 dark:text-zinc-400 backdrop-blur-xl transition-colors duration-200"
     >
@@ -304,6 +345,13 @@
                 href="/privacy"
                 class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
                 >Privacy Policy</a
+              >
+            </li>
+            <li>
+              <a
+                href="/terms"
+                class="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+                >Terms & Conditions</a
               >
             </li>
           </ul>
