@@ -178,7 +178,7 @@
   function statusTone(status: "online" | "offline") {
     return status === "online"
       ? "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-500/10 dark:text-emerald-200"
-      : "border-slate-300/70 bg-slate-100 text-slate-700 dark:border-white/10 dark:bg-white/6 dark:text-slate-300";
+      : "border-zinc-300/70 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300";
   }
 
   function riskTone(level: TeamMonitor["risk"]["level"]) {
@@ -485,10 +485,10 @@
 
 {#if loading}
   <section id="overview" class="flex min-h-[72vh] items-center justify-center p-4 sm:p-6 lg:p-8">
-    <div class="rounded-xl border border-indigo-300/30 bg-white/80 px-8 py-10 text-center shadow-[0_24px_60px_-30px_rgba(8,35,56,0.45)] backdrop-blur-xl dark:border-indigo-300/15 dark:bg-slate-900/88">
+    <div class="rounded-xl border border-zinc-200 bg-white px-8 py-10 text-center shadow-sm  dark:border-zinc-800 dark:bg-zinc-900/50">
       <LoaderCircle size={32} class="mx-auto animate-spin text-indigo-600 dark:text-indigo-300" />
-      <h1 class="mt-4 text-3xl font-bold text-slate-950 dark:text-white">Loading admin workspace</h1>
-      <p class="mt-3 max-w-xl text-sm leading-6 text-slate-600 dark:text-slate-400">
+      <h1 class="mt-4 text-3xl font-bold text-zinc-900 dark:text-white">Loading admin workspace</h1>
+      <p class="mt-3 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
         We’re assembling your host dashboard, hackathons, and the migrated monitoring panels.
       </p>
     </div>
@@ -496,17 +496,17 @@
 {:else}
   <section id="overview" class="relative p-4 pb-20 sm:p-6 lg:p-8">
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
-      <div class="rounded-xl border border-indigo-300/30 bg-white/82 p-6 shadow-[0_30px_90px_-42px_rgba(8,35,56,0.45)] backdrop-blur-xl dark:border-indigo-300/15 dark:bg-slate-900/90 sm:p-8">
+      <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm  dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-8">
         <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
           <div class="max-w-3xl">
             <p class="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-700 dark:text-indigo-300">
               Web Admin
             </p>
-            <h1 class="mt-4 text-4xl font-bold tracking-tight text-slate-950 dark:text-white sm:text-5xl">
+            <h1 class="mt-4 text-4xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
               Host dashboard for hackathons and admin controls
             </h1>
-            <p class="mt-4 text-base leading-7 text-slate-600 dark:text-slate-300">
-              Signed in as <span class="font-semibold text-slate-900 dark:text-white">{currentUser?.name}</span>.
+            <p class="mt-4 text-base leading-7 text-zinc-600 dark:text-zinc-300">
+              Signed in as <span class="font-semibold text-zinc-900 dark:text-white">{currentUser?.name}</span>.
               This dashboard is already shaped for the web-first admin move: host accounts, multiple hackathons, shared monitoring visibility, and live platform settings.
             </p>
           </div>
@@ -515,7 +515,7 @@
             <button
               type="button"
               onclick={() => loadDashboard({ silent: true })}
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-indigo-300/35 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition-colors hover:border-indigo-400 hover:text-indigo-700 dark:border-indigo-300/20 dark:bg-white/5 dark:text-slate-100 dark:hover:text-indigo-200"
+              class="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-indigo-400 hover:text-indigo-700 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:text-indigo-200"
             >
               {#if refreshing}
                 <LoaderCircle size={18} class="animate-spin" />
@@ -528,14 +528,14 @@
         </div>
 
         <div class="mt-6 flex flex-wrap gap-3">
-          <div class="rounded-full border border-indigo-300/40 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-800 dark:border-indigo-300/20 dark:bg-indigo-500/10 dark:text-indigo-200">
+          <div class="rounded-full border border-indigo-300/40 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-800 dark:border-zinc-800 dark:bg-indigo-500/10 dark:text-indigo-200">
             {platformAccessLabel()}
           </div>
-          <div class="rounded-full border border-slate-300/60 bg-white px-4 py-2 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+          <div class="rounded-full border border-zinc-300/60 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
             Hackathons stored in {hackathonSource === "appwrite" ? "Appwrite" : "local browser storage"}
           </div>
           {#if currentUser}
-            <div class="rounded-full border border-slate-300/60 bg-white px-4 py-2 text-sm font-semibold text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+            <div class="rounded-full border border-zinc-300/60 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
               Role: {currentUser.role}
             </div>
           {/if}
@@ -583,21 +583,21 @@
       {/if}
 
       <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-5 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Hosted hackathons</p>
-              <p class="mt-2 text-3xl font-bold text-slate-950 dark:text-white">{hackathons.length}</p>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Hosted hackathons</p>
+              <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">{hackathons.length}</p>
             </div>
             <Layers3 size={24} class="text-indigo-600 dark:text-indigo-300" />
           </div>
         </div>
 
-        <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-5 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Live teams</p>
-              <p class="mt-2 text-3xl font-bold text-slate-950 dark:text-white">
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Live teams</p>
+              <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">
                 {filteredTeams().filter((entry) => entry.status === "online").length}
               </p>
             </div>
@@ -605,11 +605,11 @@
           </div>
         </div>
 
-        <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-5 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Flagged teams</p>
-              <p class="mt-2 text-3xl font-bold text-slate-950 dark:text-white">
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Flagged teams</p>
+              <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">
                 {filteredTeams().filter((entry) => entry.risk.level !== "LOW").length}
               </p>
             </div>
@@ -617,11 +617,11 @@
           </div>
         </div>
 
-        <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-5 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-sm text-slate-500 dark:text-slate-400">Saved reports</p>
-              <p class="mt-2 text-3xl font-bold text-slate-950 dark:text-white">{filteredReports().length}</p>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Saved reports</p>
+              <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">{filteredReports().length}</p>
             </div>
             <FileText size={24} class="text-indigo-600 dark:text-indigo-300" />
           </div>
@@ -630,13 +630,13 @@
 
       <div id="hackathons" class="grid gap-6 xl:grid-cols-[0.92fr_1.08fr] scroll-mt-24">
         <div class="space-y-6">
-          <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-6 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+          <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
                   New Hackathon
                 </p>
-                <h2 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+                <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
                   Create an event workspace
                 </h2>
               </div>
@@ -646,35 +646,35 @@
             <form class="mt-6 space-y-4" onsubmit={handleCreateHackathon}>
               <div class="grid gap-4 md:grid-cols-2">
                 <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Hackathon ID</span>
+                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Hackathon ID</span>
                   <input
                     bind:value={newHackathon.hackathonId}
                     type="text"
                     required
                     placeholder="national-finals-2026"
-                    class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                   />
-                  <span class="mt-2 block text-xs text-slate-500 dark:text-slate-400">
+                  <span class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">
                     Participants use this ID in Sonar Code Editor to register and sign in.
                   </span>
                 </label>
 
                 <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Name</span>
+                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Name</span>
                   <input
                     bind:value={newHackathon.name}
                     type="text"
                     required
                     placeholder="National Finals 2026"
-                    class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                   />
                 </label>
 
                 <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Status</span>
+                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Status</span>
                   <select
                     bind:value={newHackathon.status}
-                    class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                   >
                     <option value="draft">Draft</option>
                     <option value="live">Live</option>
@@ -684,48 +684,48 @@
               </div>
 
               <label class="block">
-                <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Description</span>
+                <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Description</span>
                 <textarea
                   bind:value={newHackathon.description}
                   rows="3"
                   placeholder="Brief notes for organizers, judges, or proctors"
-                  class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                  class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                 ></textarea>
               </label>
 
               <div class="grid gap-4 md:grid-cols-2">
                 <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Start</span>
+                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Start</span>
                   <input
                     bind:value={newHackathon.startDate}
                     type="datetime-local"
-                    class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                   />
                 </label>
 
                 <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">End</span>
+                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">End</span>
                   <input
                     bind:value={newHackathon.endDate}
                     type="datetime-local"
-                    class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                   />
                 </label>
               </div>
 
               <div class="grid gap-3 sm:grid-cols-2">
-                <label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/4">
+                <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
                   <span>
-                    <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">Block internet</span>
-                    <span class="text-xs text-slate-500 dark:text-slate-400">Saved as hackathon default</span>
+                    <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Block internet</span>
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Saved as hackathon default</span>
                   </span>
                   <input bind:checked={newHackathon.settings.blockInternetAccess} type="checkbox" class="h-5 w-5 accent-indigo-600" />
                 </label>
 
-                <label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/4">
+                <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
                   <span>
-                    <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">Require empty workspace</span>
-                    <span class="text-xs text-slate-500 dark:text-slate-400">Saved as hackathon default</span>
+                    <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Require empty workspace</span>
+                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Saved as hackathon default</span>
                   </span>
                   <input bind:checked={newHackathon.settings.blockNonEmptyWorkspace} type="checkbox" class="h-5 w-5 accent-indigo-600" />
                 </label>
@@ -747,13 +747,13 @@
             </form>
           </div>
 
-          <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-6 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+          <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
                   Hosted Events
                 </p>
-                <h2 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+                <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
                   Your hackathons
                 </h2>
               </div>
@@ -771,17 +771,17 @@
                     }}
                     class={`w-full rounded-lg border px-4 py-4 text-left transition-colors ${
                       selectedHackathonId === entry.id
-                        ? "border-indigo-400/60 bg-indigo-50 dark:border-indigo-300/35 dark:bg-indigo-500/10"
-                        : "border-slate-200 bg-white hover:border-indigo-300 dark:border-white/10 dark:bg-white/4 dark:hover:border-indigo-300/25"
+                        ? "border-indigo-400/60 bg-indigo-50 dark:border-zinc-200 dark:bg-indigo-500/10"
+                        : "border-zinc-200 bg-white hover:border-indigo-300 dark:border-zinc-700 dark:bg-white/4 dark:hover:border-indigo-300/25"
                     }`}
                   >
                     <div class="flex items-start justify-between gap-4">
                       <div>
-                        <p class="text-base font-semibold text-slate-900 dark:text-slate-100">{entry.name}</p>
+                        <p class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{entry.name}</p>
                         <p class="mt-1 text-xs font-semibold uppercase tracking-[0.22em] text-indigo-700 dark:text-indigo-300">
                           ID: {entry.hackathonId}
                         </p>
-                        <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                        <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                           {entry.description || "No description yet."}
                         </p>
                       </div>
@@ -789,20 +789,20 @@
                         entry.status === "live"
                           ? "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-500/10 dark:text-emerald-200"
                           : entry.status === "archived"
-                            ? "border-slate-300/70 bg-slate-100 text-slate-700 dark:border-white/10 dark:bg-white/6 dark:text-slate-300"
+                            ? "border-zinc-300/70 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
                             : "border-amber-300/60 bg-amber-50 text-amber-700 dark:border-amber-400/25 dark:bg-amber-500/10 dark:text-amber-200"
                       }`}>
                         {entry.status}
                       </span>
                     </div>
-                    <div class="mt-3 flex flex-wrap gap-2 text-xs text-slate-500 dark:text-slate-400">
+                    <div class="mt-3 flex flex-wrap gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                       <span>Start: {entry.startDate ? formatDateTime(entry.startDate) : "TBD"}</span>
                       <span>End: {entry.endDate ? formatDateTime(entry.endDate) : "TBD"}</span>
                     </div>
                   </button>
                 {/each}
               {:else}
-                <div class="rounded-lg border border-dashed border-slate-300/80 px-4 py-6 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400">
+                <div class="rounded-lg border border-dashed border-zinc-300/80 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
                   No hackathons yet. Create the first event to start shaping the web-first admin flow.
                 </div>
               {/if}
@@ -811,13 +811,13 @@
         </div>
 
         <div class="space-y-6">
-          <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-6 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+          <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
                   Selected Hackathon
                 </p>
-                <h2 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+                <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
                   Event settings and live handoff
                 </h2>
               </div>
@@ -828,31 +828,31 @@
               <div class="mt-6 space-y-4">
                 <div class="grid gap-4 md:grid-cols-2">
                   <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Hackathon ID</span>
+                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Hackathon ID</span>
                     <input
                       bind:value={hackathonEditor.hackathonId}
                       type="text"
-                      class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                     />
-                    <span class="mt-2 block text-xs text-slate-500 dark:text-slate-400">
+                    <span class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">
                       Share this ID with participants for registration and sign-in.
                     </span>
                   </label>
 
                   <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Name</span>
+                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Name</span>
                     <input
                       bind:value={hackathonEditor.name}
                       type="text"
-                      class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                     />
                   </label>
 
                   <label class="block md:col-span-2">
-                    <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Status</span>
+                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Status</span>
                     <select
                       bind:value={hackathonEditor.status}
-                      class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                     >
                       <option value="draft">Draft</option>
                       <option value="live">Live</option>
@@ -862,49 +862,49 @@
                 </div>
 
                 <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Description</span>
+                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Description</span>
                   <textarea
                     bind:value={hackathonEditor.description}
                     rows="3"
-                    class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                   ></textarea>
                 </label>
 
                 <div class="grid gap-4 md:grid-cols-2">
                   <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Start</span>
+                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Start</span>
                     <input
                       bind:value={hackathonEditor.startDate}
                       type="datetime-local"
-                      class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                     />
                   </label>
 
                   <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">End</span>
+                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">End</span>
                     <input
                       bind:value={hackathonEditor.endDate}
                       type="datetime-local"
-                      class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                     />
                   </label>
                 </div>
 
                 <div class="grid gap-3 lg:grid-cols-3">
                   <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Accent color</span>
+                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Accent color</span>
                     <input
                       bind:value={hackathonEditor.settings.accentColor}
                       type="color"
-                      class="h-12 w-full rounded-lg border border-slate-200 bg-white px-2 py-2 dark:border-white/10 dark:bg-white/4"
+                      class="h-12 w-full rounded-lg border border-zinc-200 bg-white px-2 py-2 dark:border-zinc-700 dark:bg-white/4"
                     />
                   </label>
 
                   <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Editor theme</span>
+                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Editor theme</span>
                     <select
                       bind:value={hackathonEditor.settings.editorTheme}
-                      class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                     >
                       <option value="system">System</option>
                       <option value="light">Light</option>
@@ -913,10 +913,10 @@
                   </label>
 
                   <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Analytics visibility</span>
+                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Analytics visibility</span>
                     <select
                       bind:value={hackathonEditor.settings.analyticsVisibility}
-                      class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                     >
                       <option value="hosts">Hosts</option>
                       <option value="organizers">Organizers</option>
@@ -926,18 +926,18 @@
                 </div>
 
                 <div class="grid gap-3 sm:grid-cols-2">
-                  <label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/4">
+                  <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
                     <span>
-                      <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">Block internet</span>
-                      <span class="text-xs text-slate-500 dark:text-slate-400">Hackathon default</span>
+                      <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Block internet</span>
+                      <span class="text-xs text-zinc-500 dark:text-zinc-400">Hackathon default</span>
                     </span>
                     <input bind:checked={hackathonEditor.settings.blockInternetAccess} type="checkbox" class="h-5 w-5 accent-indigo-600" />
                   </label>
 
-                  <label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/4">
+                  <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
                     <span>
-                      <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">Require empty workspace</span>
-                      <span class="text-xs text-slate-500 dark:text-slate-400">Hackathon default</span>
+                      <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Require empty workspace</span>
+                      <span class="text-xs text-zinc-500 dark:text-zinc-400">Hackathon default</span>
                     </span>
                     <input bind:checked={hackathonEditor.settings.blockNonEmptyWorkspace} type="checkbox" class="h-5 w-5 accent-indigo-600" />
                   </label>
@@ -961,7 +961,7 @@
                   <button
                     type="button"
                     onclick={handleApplyHackathonSettings}
-                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-indigo-300/35 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition-colors hover:border-indigo-400 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-70 dark:border-indigo-300/20 dark:bg-white/5 dark:text-slate-100 dark:hover:text-indigo-200"
+                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-indigo-400 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-70 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:text-indigo-200"
                     disabled={syncingSettings || !snapshot.capabilities.canManagePlatform}
                   >
                     {#if syncingSettings}
@@ -988,19 +988,19 @@
                 </div>
               </div>
             {:else}
-              <div class="mt-6 rounded-lg border border-dashed border-slate-300/80 px-4 py-6 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400">
+              <div class="mt-6 rounded-lg border border-dashed border-zinc-300/80 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
                 Select a hackathon to edit its web-side settings and optionally push the restriction defaults to the current shared editor platform.
               </div>
             {/if}
           </div>
 
-          <div id="settings" class="rounded-xl border border-indigo-300/30 bg-white/85 p-6 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88 scroll-mt-24">
+          <div id="settings" class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 scroll-mt-24">
             <div class="flex items-center justify-between">
               <div>
                 <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
                   Live Platform Controls
                 </p>
-                <h2 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+                <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
                   Current shared editor state
                 </h2>
               </div>
@@ -1008,10 +1008,10 @@
             </div>
 
             <div class="mt-6 grid gap-4 lg:grid-cols-2">
-              <label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-4 dark:border-white/10 dark:bg-white/4">
+              <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-700 dark:bg-white/4">
                 <span>
-                  <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">Internet access</span>
-                  <span class="text-xs text-slate-500 dark:text-slate-400">Current live editor policy</span>
+                  <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Internet access</span>
+                  <span class="text-xs text-zinc-500 dark:text-zinc-400">Current live editor policy</span>
                 </span>
                 <button
                   type="button"
@@ -1037,10 +1037,10 @@
                 </button>
               </label>
 
-              <label class="flex items-center justify-between rounded-lg border border-slate-200 bg-white px-4 py-4 dark:border-white/10 dark:bg-white/4">
+              <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-700 dark:bg-white/4">
                 <span>
-                  <span class="block text-sm font-semibold text-slate-900 dark:text-slate-100">Workspace policy</span>
-                  <span class="text-xs text-slate-500 dark:text-slate-400">Current live editor policy</span>
+                  <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Workspace policy</span>
+                  <span class="text-xs text-zinc-500 dark:text-zinc-400">Current live editor policy</span>
                 </span>
                 <button
                   type="button"
@@ -1052,7 +1052,7 @@
                   class={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] ${
                     snapshot.settings.blockNonEmptyWorkspace
                       ? "bg-indigo-600 text-white"
-                      : "bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900"
+                      : "bg-zinc-700 text-white dark:bg-zinc-200 dark:text-zinc-900"
                   }`}
                   disabled={!snapshot.capabilities.canManagePlatform || togglingSetting !== null}
                 >
@@ -1085,24 +1085,24 @@
       </div>
 
       <div id="monitoring" class="grid gap-6 xl:grid-cols-[1.08fr_0.92fr] scroll-mt-24">
-        <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-6 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
                 Team Monitoring
               </p>
-              <h2 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+              <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
                 Current editor sessions
               </h2>
             </div>
 
-            <div class="flex items-center gap-3 rounded-lg border border-slate-200 bg-white px-4 py-3 dark:border-white/10 dark:bg-white/4">
-              <Search size={18} class="text-slate-400" />
+            <div class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
+              <Search size={18} class="text-zinc-400" />
               <input
                 bind:value={search}
                 type="text"
                 placeholder="Search team, hackathon ID, file, or window"
-                class="w-64 bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-slate-100"
+                class="w-64 bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-100"
                 oninput={syncSelectedTeam}
               />
             </div>
@@ -1111,19 +1111,19 @@
           <div class="mt-6 overflow-x-auto">
             <table class="min-w-full text-left">
               <thead>
-                <tr class="border-b border-slate-200 dark:border-white/10">
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Team</th>
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Status</th>
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Last seen</th>
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Current file</th>
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500 dark:text-slate-400">Risk</th>
+                <tr class="border-b border-zinc-200 dark:border-zinc-700">
+                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Team</th>
+                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Status</th>
+                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Last seen</th>
+                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Current file</th>
+                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Risk</th>
                 </tr>
               </thead>
               <tbody>
                 {#if filteredTeams().length}
                   {#each filteredTeams() as entry}
                     <tr
-                      class={`cursor-pointer border-b border-slate-100 transition-colors hover:bg-indigo-50/80 dark:border-white/5 dark:hover:bg-white/4 ${
+                      class={`cursor-pointer border-b border-zinc-100 transition-colors hover:bg-indigo-50/80 dark:border-white/5 dark:hover:bg-white/4 ${
                         selectedTeamId === entry.teamId ? "bg-indigo-50 dark:bg-indigo-500/10" : ""
                       }`}
                       onclick={() => {
@@ -1132,13 +1132,13 @@
                     >
                       <td class="px-3 py-4">
                         <div>
-                          <p class="font-semibold text-slate-900 dark:text-slate-100">{entry.teamName}</p>
+                          <p class="font-semibold text-zinc-900 dark:text-zinc-100">{entry.teamName}</p>
                           {#if entry.hackathonId}
                             <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-700 dark:text-indigo-300">
                               {entry.hackathonId}
                             </p>
                           {/if}
-                          <p class="text-xs text-slate-500 dark:text-slate-400">{entry.teamId}</p>
+                          <p class="text-xs text-zinc-500 dark:text-zinc-400">{entry.teamId}</p>
                         </div>
                       </td>
                       <td class="px-3 py-4">
@@ -1146,10 +1146,10 @@
                           {entry.status}
                         </span>
                       </td>
-                      <td class="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
+                      <td class="px-3 py-4 text-sm text-zinc-600 dark:text-zinc-300">
                         {formatDateTime(entry.lastSeen)}
                       </td>
-                      <td class="px-3 py-4 text-sm text-slate-600 dark:text-slate-300">
+                      <td class="px-3 py-4 text-sm text-zinc-600 dark:text-zinc-300">
                         {entry.currentFile || "Not reported"}
                       </td>
                       <td class="px-3 py-4">
@@ -1161,7 +1161,7 @@
                   {/each}
                 {:else}
                   <tr>
-                    <td colspan="5" class="px-3 py-8 text-center text-sm text-slate-500 dark:text-slate-400">
+                    <td colspan="5" class="px-3 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
                       No session data available yet for this account.
                     </td>
                   </tr>
@@ -1171,13 +1171,13 @@
           </div>
         </div>
 
-        <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-6 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
                 Analytics
               </p>
-              <h2 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+              <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
                 Team detail view
               </h2>
             </div>
@@ -1189,7 +1189,7 @@
             <div class="mt-6 space-y-5">
               <div>
                 <div class="flex flex-wrap items-center gap-3">
-                  <h3 class="text-xl font-bold text-slate-950 dark:text-white">{activeTeam.teamName}</h3>
+                  <h3 class="text-xl font-bold text-zinc-900 dark:text-white">{activeTeam.teamName}</h3>
                   <span class={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${statusTone(activeTeam.status)}`}>
                     {activeTeam.status}
                   </span>
@@ -1197,7 +1197,7 @@
                     {activeTeam.risk.level} risk
                   </span>
                 </div>
-                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
                   Last seen {formatDateTime(activeTeam.lastSeen)}
                 </p>
                 {#if activeTeam.hackathonId}
@@ -1208,34 +1208,34 @@
               </div>
 
               <div class="grid gap-3 sm:grid-cols-2">
-                <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-                  <p class="text-sm text-slate-500 dark:text-slate-400">IDE focus</p>
-                  <p class="mt-2 text-2xl font-bold text-slate-950 dark:text-white">
+                <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+                  <p class="text-sm text-zinc-500 dark:text-zinc-400">IDE focus</p>
+                  <p class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
                     {activeTeam.reportData.summary.percentInIDE}%
                   </p>
                 </div>
-                <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-                  <p class="text-sm text-slate-500 dark:text-slate-400">Online coverage</p>
-                  <p class="mt-2 text-2xl font-bold text-slate-950 dark:text-white">
+                <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+                  <p class="text-sm text-zinc-500 dark:text-zinc-400">Online coverage</p>
+                  <p class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
                     {activeTeam.reportData.summary.percentOnline}%
                   </p>
                 </div>
-                <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-                  <p class="text-sm text-slate-500 dark:text-slate-400">App switches</p>
-                  <p class="mt-2 text-2xl font-bold text-slate-950 dark:text-white">
+                <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+                  <p class="text-sm text-zinc-500 dark:text-zinc-400">App switches</p>
+                  <p class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
                     {activeTeam.risk.appBlurCount}
                   </p>
                 </div>
-                <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-                  <p class="text-sm text-slate-500 dark:text-slate-400">External pastes</p>
-                  <p class="mt-2 text-2xl font-bold text-slate-950 dark:text-white">
+                <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+                  <p class="text-sm text-zinc-500 dark:text-zinc-400">External pastes</p>
+                  <p class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
                     {activeTeam.risk.extPasteCount}
                   </p>
                 </div>
               </div>
 
-              <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-                <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Risk flags</p>
+              <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+                <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Risk flags</p>
                 <div class="mt-3 flex flex-wrap gap-2">
                   {#if activeTeam.risk.flags.length}
                     {#each activeTeam.risk.flags as flag}
@@ -1244,56 +1244,56 @@
                       </span>
                     {/each}
                   {:else}
-                    <span class="text-sm text-slate-500 dark:text-slate-400">No elevated risk flags detected from the latest telemetry snapshot.</span>
+                    <span class="text-sm text-zinc-500 dark:text-zinc-400">No elevated risk flags detected from the latest telemetry snapshot.</span>
                   {/if}
                 </div>
               </div>
 
-              <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-                <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Top applications</p>
+              <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+                <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Top applications</p>
                 <div class="mt-3 space-y-2">
                   {#if activeTeam.reportData.appUsage.length}
                     {#each activeTeam.reportData.appUsage.slice(0, 5) as app}
-                      <div class="flex items-center justify-between rounded-xl border border-slate-100 px-3 py-2 dark:border-white/5">
-                        <span class="text-sm text-slate-700 dark:text-slate-200">{app.appName}</span>
-                        <span class="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 dark:text-slate-400">
+                      <div class="flex items-center justify-between rounded-xl border border-zinc-100 px-3 py-2 dark:border-white/5">
+                        <span class="text-sm text-zinc-700 dark:text-zinc-200">{app.appName}</span>
+                        <span class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
                           {formatDuration(app.totalTime)}
                         </span>
                       </div>
                     {/each}
                   {:else}
-                    <p class="text-sm text-slate-500 dark:text-slate-400">No application usage summary is available yet.</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">No application usage summary is available yet.</p>
                   {/if}
                 </div>
               </div>
 
-              <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-                <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">Recent activity events</p>
+              <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+                <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Recent activity events</p>
                 <div class="mt-3 space-y-2">
                   {#if (activeTeam.syncData.activityEvents || []).length}
                     {#each [...(activeTeam.syncData.activityEvents || [])].slice(-6).reverse() as event}
-                      <div class="rounded-xl border border-slate-100 px-3 py-3 dark:border-white/5">
+                      <div class="rounded-xl border border-zinc-100 px-3 py-3 dark:border-white/5">
                         <div class="flex items-center justify-between gap-4">
-                          <p class="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                          <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                             {formatEventType(event.type)}
                           </p>
-                          <p class="text-xs text-slate-500 dark:text-slate-400">
+                          <p class="text-xs text-zinc-500 dark:text-zinc-400">
                             {formatDateTime(event.timestamp)}
                           </p>
                         </div>
                         {#if event.details}
-                          <p class="mt-1 text-sm text-slate-600 dark:text-slate-300">{event.details}</p>
+                          <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{event.details}</p>
                         {/if}
                       </div>
                     {/each}
                   {:else}
-                    <p class="text-sm text-slate-500 dark:text-slate-400">No event timeline is available from the latest snapshot.</p>
+                    <p class="text-sm text-zinc-500 dark:text-zinc-400">No event timeline is available from the latest snapshot.</p>
                   {/if}
                 </div>
               </div>
             </div>
           {:else}
-            <div class="mt-6 rounded-lg border border-dashed border-slate-300/80 px-4 py-6 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400">
+            <div class="mt-6 rounded-lg border border-dashed border-zinc-300/80 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
               Select a team from the monitoring table to inspect analytics and risk signals.
             </div>
           {/if}
@@ -1301,13 +1301,13 @@
       </div>
 
       <div class="grid gap-6 xl:grid-cols-[0.98fr_1.02fr]">
-        <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-6 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
                 Saved Reports
               </p>
-              <h2 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+              <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
                 Existing report artifacts
               </h2>
             </div>
@@ -1317,20 +1317,20 @@
           <div class="mt-6 space-y-3">
             {#if filteredReports().length}
               {#each filteredReports().slice(0, 8) as report}
-                <div class="rounded-lg border border-slate-200 bg-white px-4 py-4 dark:border-white/10 dark:bg-white/4">
+                <div class="rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-700 dark:bg-white/4">
                   <div class="flex items-center justify-between gap-4">
                     <div>
-                      <p class="font-semibold text-slate-900 dark:text-slate-100">{report.teamName}</p>
+                      <p class="font-semibold text-zinc-900 dark:text-zinc-100">{report.teamName}</p>
                       {#if report.hackathonId}
                         <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-700 dark:text-indigo-300">
                           {report.hackathonId}
                         </p>
                       {/if}
-                      <p class="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                      <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
                         Generated {formatDateTime(report.generatedAt)}
                       </p>
                     </div>
-                    <div class="text-right text-xs text-slate-500 dark:text-slate-400">
+                    <div class="text-right text-xs text-zinc-500 dark:text-zinc-400">
                       <p>Start: {report.sessionStart ? formatDateTime(report.sessionStart) : "N/A"}</p>
                       <p>End: {report.sessionEnd ? formatDateTime(report.sessionEnd) : "N/A"}</p>
                     </div>
@@ -1338,20 +1338,20 @@
                 </div>
               {/each}
             {:else}
-              <div class="rounded-lg border border-dashed border-slate-300/80 px-4 py-6 text-sm text-slate-500 dark:border-white/10 dark:text-slate-400">
+              <div class="rounded-lg border border-dashed border-zinc-300/80 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
                 No saved reports are visible yet from the shared editor platform.
               </div>
             {/if}
           </div>
         </div>
 
-        <div class="rounded-xl border border-indigo-300/30 bg-white/85 p-6 shadow-sm dark:border-indigo-300/15 dark:bg-slate-900/88">
+        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
                 Account
               </p>
-              <h2 class="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+              <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
                 Password and host profile
               </h2>
             </div>
@@ -1359,16 +1359,16 @@
           </div>
 
           <div class="mt-6 grid gap-4 sm:grid-cols-2">
-            <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-              <p class="text-sm text-slate-500 dark:text-slate-400">Signed in as</p>
-              <p class="mt-2 text-lg font-semibold text-slate-950 dark:text-white">{currentUser?.name}</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">{currentUser?.email}</p>
+            <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Signed in as</p>
+              <p class="mt-2 text-lg font-semibold text-zinc-900 dark:text-white">{currentUser?.name}</p>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">{currentUser?.email}</p>
             </div>
 
-            <div class="rounded-lg border border-slate-200 bg-white p-4 dark:border-white/10 dark:bg-white/4">
-              <p class="text-sm text-slate-500 dark:text-slate-400">Access mode</p>
-              <p class="mt-2 text-lg font-semibold text-slate-950 dark:text-white">{platformAccessLabel()}</p>
-              <p class="text-sm text-slate-500 dark:text-slate-400">
+            <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">Access mode</p>
+              <p class="mt-2 text-lg font-semibold text-zinc-900 dark:text-white">{platformAccessLabel()}</p>
+              <p class="text-sm text-zinc-500 dark:text-zinc-400">
                 Hackathon IDs now connect the web admin dashboard and code editor team flows. Older legacy sessions may still appear without an event ID until those clients reconnect.
               </p>
             </div>
@@ -1376,43 +1376,43 @@
 
           <form class="mt-6 space-y-4" onsubmit={handlePasswordUpdate}>
             <label class="block">
-              <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Current password</span>
+              <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Current password</span>
               <input
                 bind:value={passwordForm.currentPassword}
                 type="password"
                 required
                 autocomplete="current-password"
-                class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
               />
             </label>
 
             <div class="grid gap-4 md:grid-cols-2">
               <label class="block">
-                <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">New password</span>
+                <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">New password</span>
                 <input
                   bind:value={passwordForm.nextPassword}
                   type="password"
                   required
                   autocomplete="new-password"
-                  class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                  class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                 />
               </label>
 
               <label class="block">
-                <span class="mb-2 block text-sm font-semibold text-slate-800 dark:text-slate-100">Confirm new password</span>
+                <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Confirm new password</span>
                 <input
                   bind:value={passwordForm.confirmPassword}
                   type="password"
                   required
                   autocomplete="new-password"
-                  class="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition-colors focus:border-indigo-400 dark:border-white/10 dark:bg-white/4 dark:text-slate-100"
+                  class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
                 />
               </label>
             </div>
 
             <button
               type="submit"
-              class="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-200"
+              class="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
               disabled={updatingPassword}
             >
               {#if updatingPassword}
