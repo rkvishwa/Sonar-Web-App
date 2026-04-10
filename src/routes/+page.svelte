@@ -203,25 +203,28 @@
           {:else if clientOS === "windows"}
             <div class="w-full sm:w-auto">
               <a
-                href="/windows/download"
-                class="group relative overflow-hidden w-full sm:w-auto px-8 py-3.5 bg-zinc-900 dark:bg-white text-white dark:text-zinc-900 font-semibold rounded-lg shadow-lg shadow-zinc-900/10 dark:shadow-white/10 hover:shadow-cyan-500/25 dark:hover:shadow-cyan-400/25 border border-transparent dark:border-white/5 flex items-center justify-center gap-3 text-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
+                href="https://apps.microsoft.com/detail/9NFFN07V94DZ?hl=en-us&gl=LK&ocid=pdpshare"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="group relative overflow-hidden w-full sm:w-auto px-8 py-3.5 bg-zinc-900 dark:bg-white hover:bg-blue-300 dark:hover:bg-blue-300 text-white dark:text-blue-500 font-semibold rounded-lg shadow-lg shadow-zinc-900/10 dark:shadow-white/10 hover:shadow-cyan-500/25 dark:hover:shadow-cyan-400/25 border border-transparent dark:border-white/5 flex items-center justify-center gap-3 text-lg transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0"
               >
-                <!-- Expanding Pattern Fill Background -->
+                <!-- Expanding Circular Fill Background -->
                 <div class="absolute inset-0 flex items-center justify-center z-0 pointer-events-none overflow-hidden rounded-lg">
-                  <div class="w-[120%] aspect-square bg-cyan-600 dark:bg-cyan-500 rounded-full scale-0 opacity-0 group-hover:scale-100 group-hover:opacity-100 transition-all duration-500 ease-out flex items-center justify-center origin-center">
+                  <div class="absolute w-[300%] sm:w-[200%] aspect-square bg-linear-to-r from-cyan-500 to-blue-500 rounded-full scale-0 group-hover:scale-100 transition-transform duration-500 ease-out origin-center">
                     <div class="absolute inset-0 opacity-20 pattern-dots"></div>
                   </div>
                 </div>
                 
-                <div class="relative z-10 flex items-center gap-3 transition-all duration-300 group-hover:scale-[1.02] text-white dark:text-zinc-900 group-hover:text-white dark:group-hover:text-white">
-                  <Download size={20} class="group-hover:-translate-y-[1px] transition-transform duration-300" />
+                <div class="relative z-10 flex items-center gap-3 transition-all duration-300 group-hover:scale-[1.02] text-white dark:text-blue-500 group-hover:text-white dark:group-hover:text-white">
+                  <img src="/ms-store-white.svg" alt="Microsoft Store" class="w-7 h-7 group-hover:-translate-y-[1px] transition-transform duration-300 block dark:hidden group-hover:!hidden" />
+                  <img src="/ms-store-color.svg" alt="Microsoft Store" class="w-6 h-6 group-hover:-translate-y-[1px] transition-transform duration-300 hidden dark:block group-hover:!block" />
                   <span>Download for Windows</span>
                 </div>
               </a>
               <p
                 class="mt-3 text-[11px] font-medium text-zinc-500 dark:text-zinc-400"
               >
-                Allow permission in your browser to download the file.
+                Get it from the Microsoft Store.
               </p>
               <p class="mt-2 text-xs text-zinc-600 dark:text-zinc-400">
                 Other versions? <a
@@ -1055,7 +1058,7 @@
         Download Now
       </a>
       <a
-        href="https://github.com/rkvishwa/Sonar-Code-Editor"
+        href="https://github.com/rkvishwa/Sonar-Code-Editor/stargazers"
         target="_blank"
         rel="noreferrer"
         class="w-full sm:w-auto px-6 py-2.5 bg-white/70 dark:bg-white/6 hover:bg-white dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 font-medium rounded-lg flex items-center justify-center gap-2 border border-zinc-200/80 dark:border-white/8 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0 hover:shadow-sm"

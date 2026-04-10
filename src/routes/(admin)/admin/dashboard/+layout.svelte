@@ -12,7 +12,7 @@
     PanelLeftOpen
   } from "lucide-svelte";
   import { signOut } from "$lib/admin/auth";
-  import { goto } from "$app/navigation";
+  import { afterNavigate, goto } from "$app/navigation";
   import { onMount } from "svelte";
   import ThemeToggle from "$lib/components/ThemeToggle.svelte";
   import ErrorBoundary from "$lib/components/admin/ErrorBoundary.svelte";
@@ -20,9 +20,25 @@
 
   let { children } = $props();
 
+  let contentScrollContainer: HTMLElement | null = null;
+
   onMount(() => {
     adminStore.startPolling();
+
+    const removeAfterNavigate = afterNavigate((navigation) => {
+      if (!contentScrollContainer || !navigation.to?.url) {
+        return;
+      }
+
+      contentScrollContainer.scrollTo({
+        top: 0,
+        left: 0,
+        behavior: "auto"
+      });
+    });
+
     return () => {
+      removeAfterNavigate();
       adminStore.stopPolling();
     };
   });
@@ -169,7 +185,7 @@
   {/if}
 
   <!-- Main Content Area -->
-  <main class="flex flex-1 flex-col overflow-y-auto z-10 pt-[60px] lg:pt-0 custom-scrollbar bg-white dark:bg-zinc-900 lg:my-3 lg:rounded-l-[32px] shadow-[0_2px_20px_-8px_rgba(0,0,0,0.05)] border border-zinc-200 lg:border-r-0 dark:border-zinc-800">
+  <main bind:this={contentScrollContainer} class="flex flex-1 flex-col overflow-y-auto z-10 pt-[60px] lg:pt-0 custom-scrollbar bg-white dark:bg-zinc-900 lg:my-3 lg:rounded-l-[32px] shadow-[0_2px_20px_-8px_rgba(0,0,0,0.05)] border border-zinc-200 lg:border-r-0 dark:border-zinc-800">
     <ErrorBoundary>
       {@render children()}
     </ErrorBoundary>
