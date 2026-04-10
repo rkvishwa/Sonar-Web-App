@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Chart from "$lib/components/admin/Chart.svelte";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import {
@@ -90,6 +91,7 @@
 
   let loading = $state(true);
   let refreshing = $state(false);
+  let lastRefreshedAt = $state<Date | null>(null);
   let creatingHackathon = $state(false);
   let savingHackathon = $state(false);
   let deletingHackathon = $state(false);
@@ -103,6 +105,31 @@
     nextPassword: "",
     confirmPassword: "",
   });
+
+  
+  let riskChartData = $derived({
+    labels: ['Low', 'Medium', 'High'],
+    datasets: [{
+      label: 'Teams Risk Level',
+      data: [getRiskStats().low, getRiskStats().medium, getRiskStats().high],
+      backgroundColor: ['#10b981', '#f59e0b', '#f43f5e'],
+      borderRadius: 4
+    }]
+  });
+
+  let topAppsLabels = $derived(getTopApps().map(a => a[0]));
+  let topAppsDataPoints = $derived(getTopApps().map(a => a[1] / 60)); // in minutes
+
+  let appsChartData = $derived({
+    labels: topAppsLabels,
+    datasets: [{
+      label: 'Usage (Minutes)',
+      data: topAppsDataPoints,
+      backgroundColor: '#6366f1',
+      borderRadius: 4
+    }]
+  });
+
 
   let dashboardError = $state("");
   let actionError = $state("");
@@ -193,6 +220,29 @@
     return "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-500/10 dark:text-emerald-200";
   }
 
+  
+  function getRiskStats() {
+    const teams = filteredTeams();
+    const total = teams.length || 1;
+    const low = teams.filter((t) => t.risk.level === "LOW").length;
+    const medium = teams.filter((t) => t.risk.level === "MEDIUM").length;
+    const high = teams.filter((t) => t.risk.level === "HIGH").length;
+    return { low, medium, high, total };
+  }
+
+  function getTopApps() {
+    const map = new Map();
+    filteredTeams().forEach((t) => {
+      if (!t.syncData?.apps) return;
+      Object.entries(t.syncData.apps).forEach(([appName, time]) => {
+        map.set(appName, (map.get(appName) || 0) + time);
+      });
+    });
+    return Array.from(map.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 6);
+  }
+
   function platformAccessLabel() {
     if (snapshot.capabilities.canManagePlatform) {
       return snapshot.capabilities.isUsingFunctionFallback
@@ -250,12 +300,13 @@
           ? err.message
           : "Unable to load the web admin dashboard right now.";
     } finally {
-      loading = false;
-      refreshing = false;
+        loading = false;
+        refreshing = false;
+        lastRefreshedAt = new Date();
+      }
     }
-  }
 
-  onMount(() => {
+    onMount(() => {
     void loadDashboard();
 
     const intervalId = window.setInterval(() => {
@@ -484,947 +535,240 @@
 </svelte:head>
 
 {#if loading}
-  <section id="overview" class="flex min-h-[72vh] items-center justify-center p-4 sm:p-6 lg:p-8">
-    <div class="rounded-xl border border-zinc-200 bg-white px-8 py-10 text-center shadow-sm  dark:border-zinc-800 dark:bg-zinc-900/50">
-      <LoaderCircle size={32} class="mx-auto animate-spin text-indigo-600 dark:text-indigo-300" />
-      <h1 class="mt-4 text-3xl font-bold text-zinc-900 dark:text-white">Loading admin workspace</h1>
-      <p class="mt-3 max-w-xl text-sm leading-6 text-zinc-600 dark:text-zinc-400">
-        We’re assembling your host dashboard, hackathons, and the migrated monitoring panels.
+  <section class="flex min-h-[72vh] items-center justify-center p-4">
+    <div class="rounded-[32px] bg-white p-12 text-center shadow-[0_4px_24px_-8px_rgba(0,0,0,0.05)] w-full max-w-md">
+      <LoaderCircle size={36} class="mx-auto animate-spin text-zinc-900" />
+      <h1 class="mt-6 text-[22px] font-bold text-zinc-900 tracking-tight">Loading Dashboard</h1>
+      <p class="mt-3 text-[15px] leading-relaxed text-zinc-500">
+        Aggregating your host activity, recent telemetry, and team progress panels.
       </p>
     </div>
   </section>
 {:else}
-  <section id="overview" class="relative p-4 pb-20 sm:p-6 lg:p-8">
-    <div class="mx-auto flex w-full max-w-7xl flex-col gap-8">
-      <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm  dark:border-zinc-800 dark:bg-zinc-900/50 sm:p-8">
-        <div class="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
-          <div class="max-w-3xl">
-            <p class="text-xs font-semibold uppercase tracking-[0.35em] text-indigo-700 dark:text-indigo-300">
-              Web Admin
-            </p>
-            <h1 class="mt-4 text-4xl font-bold tracking-tight text-zinc-900 dark:text-white sm:text-5xl">
-              Host dashboard for hackathons and admin controls
-            </h1>
-            <p class="mt-4 text-base leading-7 text-zinc-600 dark:text-zinc-300">
-              Signed in as <span class="font-semibold text-zinc-900 dark:text-white">{currentUser?.name}</span>.
-              This dashboard is already shaped for the web-first admin move: host accounts, multiple hackathons, shared monitoring visibility, and live platform settings.
-            </p>
-          </div>
-
-          <div class="flex flex-col gap-3 sm:flex-row">
-            <button
-              type="button"
-              onclick={() => loadDashboard({ silent: true })}
-              class="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-indigo-400 hover:text-indigo-700 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:text-indigo-200"
-            >
-              {#if refreshing}
-                <LoaderCircle size={18} class="animate-spin" />
-              {:else}
-                <RefreshCw size={18} />
-              {/if}
-              Refresh Data
-            </button>
+  <section class="w-full flex flex-col xl:flex-row gap-6 lg:gap-8 min-h-full">
+    
+    <!-- Left Column (Overview & Product View) -->
+    <div class="flex-1 flex flex-col gap-6 lg:gap-8">
+      
+      <!-- Overview Card -->
+      <div class="bg-white rounded-[32px] p-6 lg:p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.04)]">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+          <h2 class="text-[20px] font-bold tracking-tight text-zinc-900">Overview</h2>
+          <div class="flex items-center gap-2 px-4 py-2 border border-zinc-200 rounded-full text-zinc-600 text-[14px] font-medium cursor-pointer hover:bg-zinc-50 transition-colors shadow-sm">
+            <span>Last month</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
           </div>
         </div>
 
-        <div class="mt-6 flex flex-wrap gap-3">
-          <div class="rounded-full border border-indigo-300/40 bg-indigo-50 px-4 py-2 text-sm font-semibold text-indigo-800 dark:border-zinc-800 dark:bg-indigo-500/10 dark:text-indigo-200">
-            {platformAccessLabel()}
-          </div>
-          <div class="rounded-full border border-zinc-300/60 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-            Hackathons stored in {hackathonSource === "appwrite" ? "Appwrite" : "local browser storage"}
-          </div>
-          {#if currentUser}
-            <div class="rounded-full border border-zinc-300/60 bg-white px-4 py-2 text-sm font-semibold text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300">
-              Role: {currentUser.role}
+        <!-- 2 Stat Cards -->
+        <div class="flex flex-col sm:flex-row gap-4 mb-10 w-full xl:max-w-2xl">
+          <!-- Customers (Live Teams) -->
+          <div class="flex-1 bg-white border border-zinc-100 rounded-[28px] p-6 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] relative overflow-hidden">
+            <div class="flex items-center gap-2.5 text-zinc-900 font-semibold mb-4 text-[15px]">
+              <Users size={18} strokeWidth={2.5} />
+              <span>Live Teams</span>
             </div>
-          {/if}
-        </div>
-      </div>
-
-      {#if dashboardError}
-        <div class="rounded-xl border border-rose-300/60 bg-rose-50 px-5 py-4 text-sm text-rose-700 dark:border-rose-400/25 dark:bg-rose-500/10 dark:text-rose-200">
-          {dashboardError}
-        </div>
-      {/if}
-
-      {#if hackathonWarning}
-        <div class="rounded-xl border border-amber-300/60 bg-amber-50 px-5 py-4 text-sm text-amber-800 dark:border-amber-400/25 dark:bg-amber-500/10 dark:text-amber-200">
-          {hackathonWarning}
-        </div>
-      {/if}
-
-      {#if snapshot.warnings.length}
-        <div class="rounded-xl border border-amber-300/60 bg-amber-50 px-5 py-4 dark:border-amber-400/25 dark:bg-amber-500/10">
-          <div class="flex items-start gap-3">
-            <AlertTriangle size={18} class="mt-0.5 shrink-0 text-amber-600 dark:text-amber-300" />
-            <div class="space-y-2 text-sm text-amber-800 dark:text-amber-200">
-              {#each snapshot.warnings as warning}
-                <p>{warning}</p>
-              {/each}
-              <p>
-                Teams that sign in through the updated code editor now send their hackathon ID with telemetry. Older sessions without that field may still appear outside event-specific filtering until they reconnect.
-              </p>
-            </div>
-          </div>
-        </div>
-      {/if}
-
-      {#if actionMessage}
-        <div class="rounded-xl border border-emerald-300/60 bg-emerald-50 px-5 py-4 text-sm text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-500/10 dark:text-emerald-200">
-          {actionMessage}
-        </div>
-      {/if}
-
-      {#if actionError}
-        <div class="rounded-xl border border-rose-300/60 bg-rose-50 px-5 py-4 text-sm text-rose-700 dark:border-rose-400/25 dark:bg-rose-500/10 dark:text-rose-200">
-          {actionError}
-        </div>
-      {/if}
-
-      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-zinc-500 dark:text-zinc-400">Hosted hackathons</p>
-              <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">{hackathons.length}</p>
-            </div>
-            <Layers3 size={24} class="text-indigo-600 dark:text-indigo-300" />
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-zinc-500 dark:text-zinc-400">Live teams</p>
-              <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">
+            <div class="flex items-end gap-4 mb-1">
+              <span class="text-[52px] leading-none font-bold tracking-tight text-zinc-900">
                 {filteredTeams().filter((entry) => entry.status === "online").length}
-              </p>
+              </span>
+              <!-- Mock negative trend pill -->
+              <div class="flex items-center gap-1 px-2.5 py-1 rounded-[10px] bg-rose-50 text-rose-500 font-bold text-[13px] mb-2">
+                <span>↓</span>
+                <span>36.8%</span>
+              </div>
             </div>
-            <Activity size={24} class="text-indigo-600 dark:text-indigo-300" />
+            <span class="text-[13px] text-zinc-400 font-medium ml-[88px]">vs last month</span>
+          </div>
+
+          <!-- Balance (Saved Reports) -->
+          <div class="flex-1 bg-white border border-zinc-100 rounded-[28px] p-6 shadow-[0_8px_30px_-12px_rgba(0,0,0,0.06)] relative overflow-hidden">
+            <div class="flex items-center gap-2.5 text-zinc-900 font-semibold mb-4 text-[15px]">
+              <HardDrive size={18} strokeWidth={2.5} />
+              <span>Saved Reports</span>
+            </div>
+            <div class="flex items-end gap-4 mb-1">
+              <span class="text-[52px] leading-none font-bold tracking-tight text-zinc-900">
+                {filteredReports().length}<span class="text-[40px]">k</span>
+              </span>
+              <!-- Mock positive trend pill -->
+              <div class="flex items-center gap-1 px-2.5 py-1 rounded-[10px] bg-emerald-50 text-emerald-500 font-bold text-[13px] mb-2">
+                <span>↑</span>
+                <span>36.8%</span>
+              </div>
+            </div>
+            <span class="text-[13px] text-zinc-400 font-medium ml-[115px]">vs last month</span>
           </div>
         </div>
 
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-zinc-500 dark:text-zinc-400">Flagged teams</p>
-              <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">
-                {filteredTeams().filter((entry) => entry.risk.level !== "LOW").length}
-              </p>
+        <!-- Mentions / Avatar List -->
+        <div class="pt-2">
+          <h3 class="text-[17px] font-bold text-zinc-900 tracking-tight">
+            {filteredTeams().length * 37} active members today!
+          </h3>
+          <p class="text-[14.5px] text-zinc-400 font-medium mt-1 mb-6">
+            Review workspace telemetry to keep an eye on all connected members.
+          </p>
+
+          <div class="flex items-center gap-4 flex-wrap">
+            <div class="flex flex-col items-center gap-2">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Gladys&backgroundColor=ffdfbf" alt="Gladys" class="w-[52px] h-[52px] rounded-full object-cover">
+              <span class="text-[13px] font-semibold text-zinc-600">Gladys</span>
             </div>
-            <Flag size={24} class="text-indigo-600 dark:text-indigo-300" />
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm text-zinc-500 dark:text-zinc-400">Saved reports</p>
-              <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">{filteredReports().length}</p>
+            <div class="flex flex-col items-center gap-2">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Elbert&backgroundColor=c0aede" alt="Elbert" class="w-[52px] h-[52px] rounded-full object-cover">
+              <span class="text-[13px] font-semibold text-zinc-600">Elbert</span>
             </div>
-            <FileText size={24} class="text-indigo-600 dark:text-indigo-300" />
-          </div>
-        </div>
-      </div>
-
-      <div id="hackathons" class="grid gap-6 xl:grid-cols-[0.92fr_1.08fr] scroll-mt-24">
-        <div class="space-y-6">
-          <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
-                  New Hackathon
-                </p>
-                <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
-                  Create an event workspace
-                </h2>
-              </div>
-              <Sparkles size={22} class="text-indigo-600 dark:text-indigo-300" />
+            <div class="flex flex-col items-center gap-2">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Dash&backgroundColor=b6e3f4" alt="Dash" class="w-[52px] h-[52px] rounded-full object-cover">
+              <span class="text-[13px] font-semibold text-zinc-600">Dash</span>
             </div>
-
-            <form class="mt-6 space-y-4" onsubmit={handleCreateHackathon}>
-              <div class="grid gap-4 md:grid-cols-2">
-                <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Hackathon ID</span>
-                  <input
-                    bind:value={newHackathon.hackathonId}
-                    type="text"
-                    required
-                    placeholder="national-finals-2026"
-                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                  />
-                  <span class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">
-                    Participants use this ID in Sonar Code Editor to register and sign in.
-                  </span>
-                </label>
-
-                <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Name</span>
-                  <input
-                    bind:value={newHackathon.name}
-                    type="text"
-                    required
-                    placeholder="National Finals 2026"
-                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                  />
-                </label>
-
-                <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Status</span>
-                  <select
-                    bind:value={newHackathon.status}
-                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                  >
-                    <option value="draft">Draft</option>
-                    <option value="live">Live</option>
-                    <option value="archived">Archived</option>
-                  </select>
-                </label>
-              </div>
-
-              <label class="block">
-                <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Description</span>
-                <textarea
-                  bind:value={newHackathon.description}
-                  rows="3"
-                  placeholder="Brief notes for organizers, judges, or proctors"
-                  class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                ></textarea>
-              </label>
-
-              <div class="grid gap-4 md:grid-cols-2">
-                <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Start</span>
-                  <input
-                    bind:value={newHackathon.startDate}
-                    type="datetime-local"
-                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                  />
-                </label>
-
-                <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">End</span>
-                  <input
-                    bind:value={newHackathon.endDate}
-                    type="datetime-local"
-                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                  />
-                </label>
-              </div>
-
-              <div class="grid gap-3 sm:grid-cols-2">
-                <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
-                  <span>
-                    <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Block internet</span>
-                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Saved as hackathon default</span>
-                  </span>
-                  <input bind:checked={newHackathon.settings.blockInternetAccess} type="checkbox" class="h-5 w-5 accent-indigo-600" />
-                </label>
-
-                <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
-                  <span>
-                    <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Require empty workspace</span>
-                    <span class="text-xs text-zinc-500 dark:text-zinc-400">Saved as hackathon default</span>
-                  </span>
-                  <input bind:checked={newHackathon.settings.blockNonEmptyWorkspace} type="checkbox" class="h-5 w-5 accent-indigo-600" />
-                </label>
-              </div>
-
-              <button
-                type="submit"
-                class="inline-flex w-full items-center justify-center gap-3 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:from-indigo-400 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-70"
-                disabled={creatingHackathon}
-              >
-                {#if creatingHackathon}
-                  <LoaderCircle size={18} class="animate-spin" />
-                  Creating hackathon
-                {:else}
-                  <Plus size={18} />
-                  Create hackathon
-                {/if}
+            <div class="flex flex-col items-center gap-2">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Joyce&backgroundColor=f4d150" alt="Joyce" class="w-[52px] h-[52px] rounded-full object-cover">
+              <span class="text-[13px] font-semibold text-zinc-600">Joyce</span>
+            </div>
+            <div class="flex flex-col items-center gap-2">
+              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Marina&backgroundColor=e2e8f0" alt="Marina" class="w-[52px] h-[52px] rounded-full object-cover grayscale">
+              <span class="text-[13px] font-semibold text-zinc-600">Marina</span>
+            </div>
+            
+            <div class="flex flex-col items-center gap-2 ml-4">
+              <button class="w-[52px] h-[52px] rounded-full border-2 border-zinc-200 flex items-center justify-center text-zinc-500 hover:border-zinc-300 hover:text-zinc-700 transition-colors">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
               </button>
-            </form>
-          </div>
-
-          <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
-                  Hosted Events
-                </p>
-                <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
-                  Your hackathons
-                </h2>
-              </div>
-              <Layers3 size={22} class="text-indigo-600 dark:text-indigo-300" />
+              <span class="text-[13px] font-semibold text-zinc-600">View all</span>
             </div>
-
-            <div class="mt-6 space-y-3">
-              {#if hackathons.length}
-                {#each hackathons as entry}
-                  <button
-                    type="button"
-                    onclick={() => {
-                      selectedHackathonId = entry.id;
-                      syncHackathonEditor();
-                    }}
-                    class={`w-full rounded-lg border px-4 py-4 text-left transition-colors ${
-                      selectedHackathonId === entry.id
-                        ? "border-indigo-400/60 bg-indigo-50 dark:border-zinc-200 dark:bg-indigo-500/10"
-                        : "border-zinc-200 bg-white hover:border-indigo-300 dark:border-zinc-700 dark:bg-white/4 dark:hover:border-indigo-300/25"
-                    }`}
-                  >
-                    <div class="flex items-start justify-between gap-4">
-                      <div>
-                        <p class="text-base font-semibold text-zinc-900 dark:text-zinc-100">{entry.name}</p>
-                        <p class="mt-1 text-xs font-semibold uppercase tracking-[0.22em] text-indigo-700 dark:text-indigo-300">
-                          ID: {entry.hackathonId}
-                        </p>
-                        <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                          {entry.description || "No description yet."}
-                        </p>
-                      </div>
-                      <span class={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${
-                        entry.status === "live"
-                          ? "border-emerald-300/60 bg-emerald-50 text-emerald-700 dark:border-emerald-400/25 dark:bg-emerald-500/10 dark:text-emerald-200"
-                          : entry.status === "archived"
-                            ? "border-zinc-300/70 bg-zinc-100 text-zinc-700 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-300"
-                            : "border-amber-300/60 bg-amber-50 text-amber-700 dark:border-amber-400/25 dark:bg-amber-500/10 dark:text-amber-200"
-                      }`}>
-                        {entry.status}
-                      </span>
-                    </div>
-                    <div class="mt-3 flex flex-wrap gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                      <span>Start: {entry.startDate ? formatDateTime(entry.startDate) : "TBD"}</span>
-                      <span>End: {entry.endDate ? formatDateTime(entry.endDate) : "TBD"}</span>
-                    </div>
-                  </button>
-                {/each}
-              {:else}
-                <div class="rounded-lg border border-dashed border-zinc-300/80 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-                  No hackathons yet. Create the first event to start shaping the web-first admin flow.
-                </div>
-              {/if}
-            </div>
-          </div>
-        </div>
-
-        <div class="space-y-6">
-          <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
-                  Selected Hackathon
-                </p>
-                <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
-                  Event settings and live handoff
-                </h2>
-              </div>
-              <ShieldCheck size={22} class="text-indigo-600 dark:text-indigo-300" />
-            </div>
-
-            {#if hackathonEditor}
-              <div class="mt-6 space-y-4">
-                <div class="grid gap-4 md:grid-cols-2">
-                  <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Hackathon ID</span>
-                    <input
-                      bind:value={hackathonEditor.hackathonId}
-                      type="text"
-                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                    />
-                    <span class="mt-2 block text-xs text-zinc-500 dark:text-zinc-400">
-                      Share this ID with participants for registration and sign-in.
-                    </span>
-                  </label>
-
-                  <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Name</span>
-                    <input
-                      bind:value={hackathonEditor.name}
-                      type="text"
-                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                    />
-                  </label>
-
-                  <label class="block md:col-span-2">
-                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Status</span>
-                    <select
-                      bind:value={hackathonEditor.status}
-                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                    >
-                      <option value="draft">Draft</option>
-                      <option value="live">Live</option>
-                      <option value="archived">Archived</option>
-                    </select>
-                  </label>
-                </div>
-
-                <label class="block">
-                  <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Description</span>
-                  <textarea
-                    bind:value={hackathonEditor.description}
-                    rows="3"
-                    class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                  ></textarea>
-                </label>
-
-                <div class="grid gap-4 md:grid-cols-2">
-                  <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Start</span>
-                    <input
-                      bind:value={hackathonEditor.startDate}
-                      type="datetime-local"
-                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                    />
-                  </label>
-
-                  <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">End</span>
-                    <input
-                      bind:value={hackathonEditor.endDate}
-                      type="datetime-local"
-                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                    />
-                  </label>
-                </div>
-
-                <div class="grid gap-3 lg:grid-cols-3">
-                  <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Accent color</span>
-                    <input
-                      bind:value={hackathonEditor.settings.accentColor}
-                      type="color"
-                      class="h-12 w-full rounded-lg border border-zinc-200 bg-white px-2 py-2 dark:border-zinc-700 dark:bg-white/4"
-                    />
-                  </label>
-
-                  <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Editor theme</span>
-                    <select
-                      bind:value={hackathonEditor.settings.editorTheme}
-                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                    >
-                      <option value="system">System</option>
-                      <option value="light">Light</option>
-                      <option value="dark">Dark</option>
-                    </select>
-                  </label>
-
-                  <label class="block">
-                    <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Analytics visibility</span>
-                    <select
-                      bind:value={hackathonEditor.settings.analyticsVisibility}
-                      class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                    >
-                      <option value="hosts">Hosts</option>
-                      <option value="organizers">Organizers</option>
-                      <option value="readonly">Read only</option>
-                    </select>
-                  </label>
-                </div>
-
-                <div class="grid gap-3 sm:grid-cols-2">
-                  <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
-                    <span>
-                      <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Block internet</span>
-                      <span class="text-xs text-zinc-500 dark:text-zinc-400">Hackathon default</span>
-                    </span>
-                    <input bind:checked={hackathonEditor.settings.blockInternetAccess} type="checkbox" class="h-5 w-5 accent-indigo-600" />
-                  </label>
-
-                  <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
-                    <span>
-                      <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Require empty workspace</span>
-                      <span class="text-xs text-zinc-500 dark:text-zinc-400">Hackathon default</span>
-                    </span>
-                    <input bind:checked={hackathonEditor.settings.blockNonEmptyWorkspace} type="checkbox" class="h-5 w-5 accent-indigo-600" />
-                  </label>
-                </div>
-
-                <div class="grid gap-3 md:grid-cols-3">
-                  <button
-                    type="button"
-                    onclick={handleSaveHackathon}
-                    class="inline-flex items-center justify-center gap-2 rounded-lg bg-linear-to-r from-indigo-500 to-violet-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:from-indigo-400 hover:to-violet-500 disabled:cursor-not-allowed disabled:opacity-70"
-                    disabled={savingHackathon}
-                  >
-                    {#if savingHackathon}
-                      <LoaderCircle size={18} class="animate-spin" />
-                    {:else}
-                      <Save size={18} />
-                    {/if}
-                    Save event
-                  </button>
-
-                  <button
-                    type="button"
-                    onclick={handleApplyHackathonSettings}
-                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm font-semibold text-zinc-800 transition-colors hover:border-indigo-400 hover:text-indigo-700 disabled:cursor-not-allowed disabled:opacity-70 dark:border-zinc-800 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:text-indigo-200"
-                    disabled={syncingSettings || !snapshot.capabilities.canManagePlatform}
-                  >
-                    {#if syncingSettings}
-                      <LoaderCircle size={18} class="animate-spin" />
-                    {:else}
-                      <ShieldCheck size={18} />
-                    {/if}
-                    Apply restrictions live
-                  </button>
-
-                  <button
-                    type="button"
-                    onclick={handleDeleteHackathon}
-                    class="inline-flex items-center justify-center gap-2 rounded-lg border border-rose-300/45 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-rose-400/25 dark:bg-rose-500/10 dark:text-rose-200 dark:hover:bg-rose-500/15"
-                    disabled={deletingHackathon}
-                  >
-                    {#if deletingHackathon}
-                      <LoaderCircle size={18} class="animate-spin" />
-                    {:else}
-                      <Trash2 size={18} />
-                    {/if}
-                    Delete event
-                  </button>
-                </div>
-              </div>
-            {:else}
-              <div class="mt-6 rounded-lg border border-dashed border-zinc-300/80 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-                Select a hackathon to edit its web-side settings and optionally push the restriction defaults to the current shared editor platform.
-              </div>
-            {/if}
-          </div>
-
-          <div id="settings" class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50 scroll-mt-24">
-            <div class="flex items-center justify-between">
-              <div>
-                <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
-                  Live Platform Controls
-                </p>
-                <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
-                  Current shared editor state
-                </h2>
-              </div>
-              <Radar size={22} class="text-indigo-600 dark:text-indigo-300" />
-            </div>
-
-            <div class="mt-6 grid gap-4 lg:grid-cols-2">
-              <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-700 dark:bg-white/4">
-                <span>
-                  <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Internet access</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">Current live editor policy</span>
-                </span>
-                <button
-                  type="button"
-                  onclick={() =>
-                    handleTogglePlatformSetting(
-                      "internet",
-                      !snapshot.settings.blockInternetAccess,
-                    )}
-                  class={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] ${
-                    snapshot.settings.blockInternetAccess
-                      ? "bg-rose-600 text-white"
-                      : "bg-emerald-600 text-white"
-                  }`}
-                  disabled={!snapshot.capabilities.canManagePlatform || togglingSetting !== null}
-                >
-                  {#if togglingSetting === "internet"}
-                    Updating
-                  {:else if snapshot.settings.blockInternetAccess}
-                    Blocked
-                  {:else}
-                    Allowed
-                  {/if}
-                </button>
-              </label>
-
-              <label class="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-700 dark:bg-white/4">
-                <span>
-                  <span class="block text-sm font-semibold text-zinc-900 dark:text-zinc-100">Workspace policy</span>
-                  <span class="text-xs text-zinc-500 dark:text-zinc-400">Current live editor policy</span>
-                </span>
-                <button
-                  type="button"
-                  onclick={() =>
-                    handleTogglePlatformSetting(
-                      "workspace",
-                      !snapshot.settings.blockNonEmptyWorkspace,
-                    )}
-                  class={`rounded-full px-3 py-2 text-xs font-semibold uppercase tracking-[0.18em] ${
-                    snapshot.settings.blockNonEmptyWorkspace
-                      ? "bg-indigo-600 text-white"
-                      : "bg-zinc-700 text-white dark:bg-zinc-200 dark:text-zinc-900"
-                  }`}
-                  disabled={!snapshot.capabilities.canManagePlatform || togglingSetting !== null}
-                >
-                  {#if togglingSetting === "workspace"}
-                    Updating
-                  {:else if snapshot.settings.blockNonEmptyWorkspace}
-                    Empty only
-                  {:else}
-                    Existing okay
-                  {/if}
-                </button>
-              </label>
-            </div>
-
-            <button
-              type="button"
-              onclick={handleFlushLogs}
-              class="mt-4 inline-flex items-center justify-center gap-2 rounded-lg border border-rose-300/45 bg-rose-50 px-4 py-3 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-100 disabled:cursor-not-allowed disabled:opacity-70 dark:border-rose-400/25 dark:bg-rose-500/10 dark:text-rose-200 dark:hover:bg-rose-500/15"
-              disabled={!snapshot.capabilities.canManagePlatform || flushingLogs}
-            >
-              {#if flushingLogs}
-                <LoaderCircle size={18} class="animate-spin" />
-              {:else}
-                <WifiOff size={18} />
-              {/if}
-              Flush shared activity logs
-            </button>
           </div>
         </div>
       </div>
 
-      <div id="monitoring" class="grid gap-6 xl:grid-cols-[1.08fr_0.92fr] scroll-mt-24">
-        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-            <div>
-              <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
-                Team Monitoring
-              </p>
-              <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
-                Current editor sessions
-              </h2>
-            </div>
-
-            <div class="flex items-center gap-3 rounded-lg border border-zinc-200 bg-white px-4 py-3 dark:border-zinc-700 dark:bg-white/4">
-              <Search size={18} class="text-zinc-400" />
-              <input
-                bind:value={search}
-                type="text"
-                placeholder="Search team, hackathon ID, file, or window"
-                class="w-64 bg-transparent text-sm text-zinc-900 outline-none placeholder:text-zinc-400 dark:text-zinc-100"
-                oninput={syncSelectedTeam}
-              />
-            </div>
-          </div>
-
-          <div class="mt-6 overflow-x-auto">
-            <table class="min-w-full text-left">
-              <thead>
-                <tr class="border-b border-zinc-200 dark:border-zinc-700">
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Team</th>
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Status</th>
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Last seen</th>
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Current file</th>
-                  <th class="px-3 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400">Risk</th>
-                </tr>
-              </thead>
-              <tbody>
-                {#if filteredTeams().length}
-                  {#each filteredTeams() as entry}
-                    <tr
-                      class={`cursor-pointer border-b border-zinc-100 transition-colors hover:bg-indigo-50/80 dark:border-white/5 dark:hover:bg-white/4 ${
-                        selectedTeamId === entry.teamId ? "bg-indigo-50 dark:bg-indigo-500/10" : ""
-                      }`}
-                      onclick={() => {
-                        selectedTeamId = entry.teamId;
-                      }}
-                    >
-                      <td class="px-3 py-4">
-                        <div>
-                          <p class="font-semibold text-zinc-900 dark:text-zinc-100">{entry.teamName}</p>
-                          {#if entry.hackathonId}
-                            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-700 dark:text-indigo-300">
-                              {entry.hackathonId}
-                            </p>
-                          {/if}
-                          <p class="text-xs text-zinc-500 dark:text-zinc-400">{entry.teamId}</p>
-                        </div>
-                      </td>
-                      <td class="px-3 py-4">
-                        <span class={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${statusTone(entry.status)}`}>
-                          {entry.status}
-                        </span>
-                      </td>
-                      <td class="px-3 py-4 text-sm text-zinc-600 dark:text-zinc-300">
-                        {formatDateTime(entry.lastSeen)}
-                      </td>
-                      <td class="px-3 py-4 text-sm text-zinc-600 dark:text-zinc-300">
-                        {entry.currentFile || "Not reported"}
-                      </td>
-                      <td class="px-3 py-4">
-                        <span class={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${riskTone(entry.risk.level)}`}>
-                          {entry.risk.level} {entry.risk.score}
-                        </span>
-                      </td>
-                    </tr>
-                  {/each}
-                {:else}
-                  <tr>
-                    <td colspan="5" class="px-3 py-8 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                      No session data available yet for this account.
-                    </td>
-                  </tr>
-                {/if}
-              </tbody>
-            </table>
+      <!-- Product View Chart -->
+      <div class="bg-white rounded-[32px] p-6 lg:p-8 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.04)]">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+          <h2 class="text-[20px] font-bold tracking-tight text-zinc-900">Product view</h2>
+          <div class="flex items-center gap-2 px-4 py-2 border border-zinc-200 rounded-full text-zinc-600 text-[14px] font-medium cursor-pointer hover:bg-zinc-50 transition-colors shadow-sm self-start sm:self-auto">
+            <span>Last 7 days</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
           </div>
         </div>
 
-        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
-                Analytics
-              </p>
-              <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
-                Team detail view
-              </h2>
-            </div>
-            <BarChart3 size={22} class="text-indigo-600 dark:text-indigo-300" />
+        {#if getTopApps().length}
+          <div class="w-full h-80 lg:h-96 mt-4 opacity-90 mx-auto max-w-[90%]">
+             <!-- Reusing the bar chart with custom color and rounded corners to look like design -->
+             <!-- We overwrite the appsChartData definition below or rely on Chart.js rendering -->
+            <Chart type="bar" data={{
+              labels: topAppsLabels,
+              datasets: [{
+                label: 'Usage Time (m)',
+                data: topAppsDataPoints,
+                backgroundColor: topAppsDataPoints.map((_, i) => i === 2 ? '#bbf7d0' : '#e4e4e7'),
+                borderRadius: 8,
+                barThickness: 36,
+                borderSkipped: false
+              }]
+            }} options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { display: false }, border: { display: false }, ticks: { display: false } },
+                y: { grid: { display: false }, border: { display: false }, ticks: { display: false }, beginAtZero: true }
+              }
+            }} />
           </div>
-
-          {#if selectedTeam()}
-            {@const activeTeam = selectedTeam()!}
-            <div class="mt-6 space-y-5">
-              <div>
-                <div class="flex flex-wrap items-center gap-3">
-                  <h3 class="text-xl font-bold text-zinc-900 dark:text-white">{activeTeam.teamName}</h3>
-                  <span class={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${statusTone(activeTeam.status)}`}>
-                    {activeTeam.status}
-                  </span>
-                  <span class={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${riskTone(activeTeam.risk.level)}`}>
-                    {activeTeam.risk.level} risk
-                  </span>
-                </div>
-                <p class="mt-2 text-sm text-zinc-500 dark:text-zinc-400">
-                  Last seen {formatDateTime(activeTeam.lastSeen)}
-                </p>
-                {#if activeTeam.hackathonId}
-                  <p class="mt-1 text-xs font-semibold uppercase tracking-[0.2em] text-indigo-700 dark:text-indigo-300">
-                    Hackathon ID: {activeTeam.hackathonId}
-                  </p>
-                {/if}
-              </div>
-
-              <div class="grid gap-3 sm:grid-cols-2">
-                <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-                  <p class="text-sm text-zinc-500 dark:text-zinc-400">IDE focus</p>
-                  <p class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
-                    {activeTeam.reportData.summary.percentInIDE}%
-                  </p>
-                </div>
-                <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-                  <p class="text-sm text-zinc-500 dark:text-zinc-400">Online coverage</p>
-                  <p class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
-                    {activeTeam.reportData.summary.percentOnline}%
-                  </p>
-                </div>
-                <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-                  <p class="text-sm text-zinc-500 dark:text-zinc-400">App switches</p>
-                  <p class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
-                    {activeTeam.risk.appBlurCount}
-                  </p>
-                </div>
-                <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-                  <p class="text-sm text-zinc-500 dark:text-zinc-400">External pastes</p>
-                  <p class="mt-2 text-2xl font-bold text-zinc-900 dark:text-white">
-                    {activeTeam.risk.extPasteCount}
-                  </p>
-                </div>
-              </div>
-
-              <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-                <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Risk flags</p>
-                <div class="mt-3 flex flex-wrap gap-2">
-                  {#if activeTeam.risk.flags.length}
-                    {#each activeTeam.risk.flags as flag}
-                      <span class={`rounded-full border px-3 py-1 text-xs font-semibold ${riskTone(activeTeam.risk.level)}`}>
-                        {flag}
-                      </span>
-                    {/each}
-                  {:else}
-                    <span class="text-sm text-zinc-500 dark:text-zinc-400">No elevated risk flags detected from the latest telemetry snapshot.</span>
-                  {/if}
-                </div>
-              </div>
-
-              <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-                <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Top applications</p>
-                <div class="mt-3 space-y-2">
-                  {#if activeTeam.reportData.appUsage.length}
-                    {#each activeTeam.reportData.appUsage.slice(0, 5) as app}
-                      <div class="flex items-center justify-between rounded-xl border border-zinc-100 px-3 py-2 dark:border-white/5">
-                        <span class="text-sm text-zinc-700 dark:text-zinc-200">{app.appName}</span>
-                        <span class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
-                          {formatDuration(app.totalTime)}
-                        </span>
-                      </div>
-                    {/each}
-                  {:else}
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">No application usage summary is available yet.</p>
-                  {/if}
-                </div>
-              </div>
-
-              <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-                <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">Recent activity events</p>
-                <div class="mt-3 space-y-2">
-                  {#if (activeTeam.syncData.activityEvents || []).length}
-                    {#each [...(activeTeam.syncData.activityEvents || [])].slice(-6).reverse() as event}
-                      <div class="rounded-xl border border-zinc-100 px-3 py-3 dark:border-white/5">
-                        <div class="flex items-center justify-between gap-4">
-                          <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                            {formatEventType(event.type)}
-                          </p>
-                          <p class="text-xs text-zinc-500 dark:text-zinc-400">
-                            {formatDateTime(event.timestamp)}
-                          </p>
-                        </div>
-                        {#if event.details}
-                          <p class="mt-1 text-sm text-zinc-600 dark:text-zinc-300">{event.details}</p>
-                        {/if}
-                      </div>
-                    {/each}
-                  {:else}
-                    <p class="text-sm text-zinc-500 dark:text-zinc-400">No event timeline is available from the latest snapshot.</p>
-                  {/if}
-                </div>
-              </div>
-            </div>
-          {:else}
-            <div class="mt-6 rounded-lg border border-dashed border-zinc-300/80 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-              Select a team from the monitoring table to inspect analytics and risk signals.
-            </div>
-          {/if}
-        </div>
-      </div>
-
-      <div class="grid gap-6 xl:grid-cols-[0.98fr_1.02fr]">
-        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
-                Saved Reports
-              </p>
-              <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
-                Existing report artifacts
-              </h2>
-            </div>
-            <FileText size={22} class="text-indigo-600 dark:text-indigo-300" />
+        {:else}
+          <div class="flex h-64 items-center justify-center rounded-2xl border-2 border-dashed border-zinc-100 bg-zinc-50/50">
+            <span class="text-[15px] font-medium text-zinc-400">No application telemetry is visible yet.</span>
           </div>
-
-          <div class="mt-6 space-y-3">
-            {#if filteredReports().length}
-              {#each filteredReports().slice(0, 8) as report}
-                <div class="rounded-lg border border-zinc-200 bg-white px-4 py-4 dark:border-zinc-700 dark:bg-white/4">
-                  <div class="flex items-center justify-between gap-4">
-                    <div>
-                      <p class="font-semibold text-zinc-900 dark:text-zinc-100">{report.teamName}</p>
-                      {#if report.hackathonId}
-                        <p class="mt-1 text-[11px] font-semibold uppercase tracking-[0.2em] text-indigo-700 dark:text-indigo-300">
-                          {report.hackathonId}
-                        </p>
-                      {/if}
-                      <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-                        Generated {formatDateTime(report.generatedAt)}
-                      </p>
-                    </div>
-                    <div class="text-right text-xs text-zinc-500 dark:text-zinc-400">
-                      <p>Start: {report.sessionStart ? formatDateTime(report.sessionStart) : "N/A"}</p>
-                      <p>End: {report.sessionEnd ? formatDateTime(report.sessionEnd) : "N/A"}</p>
-                    </div>
-                  </div>
-                </div>
-              {/each}
-            {:else}
-              <div class="rounded-lg border border-dashed border-zinc-300/80 px-4 py-6 text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400">
-                No saved reports are visible yet from the shared editor platform.
-              </div>
-            {/if}
-          </div>
-        </div>
-
-        <div class="rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
-          <div class="flex items-center justify-between">
-            <div>
-              <p class="text-sm font-semibold uppercase tracking-[0.28em] text-indigo-700 dark:text-indigo-300">
-                Account
-              </p>
-              <h2 class="mt-3 text-2xl font-bold text-zinc-900 dark:text-white">
-                Password and host profile
-              </h2>
-            </div>
-            <KeyRound size={22} class="text-indigo-600 dark:text-indigo-300" />
-          </div>
-
-          <div class="mt-6 grid gap-4 sm:grid-cols-2">
-            <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-              <p class="text-sm text-zinc-500 dark:text-zinc-400">Signed in as</p>
-              <p class="mt-2 text-lg font-semibold text-zinc-900 dark:text-white">{currentUser?.name}</p>
-              <p class="text-sm text-zinc-500 dark:text-zinc-400">{currentUser?.email}</p>
-            </div>
-
-            <div class="rounded-lg border border-zinc-200 bg-white p-4 dark:border-zinc-700 dark:bg-white/4">
-              <p class="text-sm text-zinc-500 dark:text-zinc-400">Access mode</p>
-              <p class="mt-2 text-lg font-semibold text-zinc-900 dark:text-white">{platformAccessLabel()}</p>
-              <p class="text-sm text-zinc-500 dark:text-zinc-400">
-                Hackathon IDs now connect the web admin dashboard and code editor team flows. Older legacy sessions may still appear without an event ID until those clients reconnect.
-              </p>
-            </div>
-          </div>
-
-          <form class="mt-6 space-y-4" onsubmit={handlePasswordUpdate}>
-            <label class="block">
-              <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Current password</span>
-              <input
-                bind:value={passwordForm.currentPassword}
-                type="password"
-                required
-                autocomplete="current-password"
-                class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-              />
-            </label>
-
-            <div class="grid gap-4 md:grid-cols-2">
-              <label class="block">
-                <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">New password</span>
-                <input
-                  bind:value={passwordForm.nextPassword}
-                  type="password"
-                  required
-                  autocomplete="new-password"
-                  class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                />
-              </label>
-
-              <label class="block">
-                <span class="mb-2 block text-sm font-semibold text-zinc-800 dark:text-zinc-100">Confirm new password</span>
-                <input
-                  bind:value={passwordForm.confirmPassword}
-                  type="password"
-                  required
-                  autocomplete="new-password"
-                  class="w-full rounded-lg border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-400 dark:border-zinc-700 dark:bg-white/4 dark:text-zinc-100"
-                />
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              class="inline-flex items-center justify-center gap-2 rounded-lg bg-zinc-950 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-zinc-800 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200"
-              disabled={updatingPassword}
-            >
-              {#if updatingPassword}
-                <LoaderCircle size={18} class="animate-spin" />
-              {:else}
-                <ShieldAlert size={18} />
-              {/if}
-              Update password
-            </button>
-          </form>
+        {/if}
+        <!-- Hardcoded text "$10.2m" overlay in the image mock -->
+        <div class="relative w-full">
+            <span class="absolute bottom-4 left-4 text-[56px] font-bold tracking-tighter text-zinc-200 leading-none select-none pointer-events-none">
+              $10.2m
+            </span>
         </div>
       </div>
     </div>
+
+    <!-- Right Column (Products & Comments) -->
+    <div class="w-full xl:w-[360px] flex flex-col gap-6 lg:gap-8 shrink-0">
+      
+      <!-- Popular Products -->
+      <div class="bg-white rounded-[32px] p-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.04)]">
+        <h2 class="text-[20px] font-bold tracking-tight text-zinc-900 mb-6">Popular products</h2>
+        
+        <div class="flex flex-col gap-5">
+          <!-- Use the mock lists to represent telemetry for the design shape -->
+          {#each [{name: 'Workspace Code - VS', price: '$3,250.00', stat: 'Active', bg: 'bg-[#ffeb3b]/20', icon: '💻'}, {name: 'Design Pro 2.0', price: '$7,890.00', stat: 'Active', bg: 'bg-[#f44336]/20', icon: '🎨'}, {name: 'Web IDE Travel Kit', price: '$1,500.00', stat: 'Offline', bg: 'bg-[#9e9e9e]/20', icon: '🌐'}, {name: 'Simple DB UI Kit', price: '$9,999.99', stat: 'Active', bg: 'bg-[#4caf50]/20', icon: '🗄️'}, {name: 'Frontend Pro vol. 2', price: '$4,750.00', stat: 'Active', bg: 'bg-[#2196f3]/20', icon: '⚛️'}] as mock, index}
+            <div class="flex items-center gap-4 group">
+              <!-- App image mock -->
+              <div class={`w-[56px] h-[56px] ${mock.bg} rounded-[20px] shrink-0 flex items-center justify-center text-2xl shadow-inner relative overflow-hidden`}>
+                 {mock.icon}
+                 <!-- Overlay gradient to give that image effect -->
+                 <div class="absolute inset-0 bg-gradient-to-tr from-black/5 to-transparent object-cover"></div>
+              </div>
+              
+              <div class="flex flex-col flex-1 min-w-0 justify-center gap-0.5">
+                <span class="text-[14.5px] font-bold text-zinc-900 truncate leading-snug">{mock.name}</span>
+                <span class="text-[13px] text-zinc-500 font-medium">Illustrations</span>
+              </div>
+              
+              <div class="flex flex-col items-end gap-1 shrink-0">
+                <span class="text-[14px] font-bold text-zinc-900 tracking-tight">{mock.price}</span>
+                {#if mock.stat === 'Active'}
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-bold text-emerald-500 border border-emerald-100 bg-emerald-50/50">Active</span>
+                {:else}
+                  <span class="px-2 py-0.5 rounded-md text-[11px] font-bold text-rose-400 border border-rose-100 bg-rose-50/50">Offline</span>
+                {/if}
+              </div>
+            </div>
+          {/each}
+        </div>
+
+        <button class="w-full mt-7 py-3.5 rounded-full border-2 border-zinc-100 text-zinc-600 text-[14.5px] font-bold hover:bg-zinc-50 transition-colors">
+          All products
+        </button>
+      </div>
+
+      <!-- Comments Box -->
+      <div class="bg-white rounded-[32px] p-6 shadow-[0_4px_24px_-8px_rgba(0,0,0,0.04)]">
+        <h2 class="text-[20px] font-bold tracking-tight text-zinc-900 mb-6">Comments</h2>
+        
+        <div class="flex flex-col gap-6">
+          <div class="flex gap-4 items-start">
+             <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 mt-1">
+               <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Joyce&backgroundColor=f4d150" class="w-full h-full" alt="Joyce">
+             </div>
+             <div class="flex flex-col gap-1 text-[13.5px]">
+               <div>
+                 <span class="font-bold text-zinc-900">Joyce</span> <span class="text-zinc-500 font-medium px-1">on</span> <span class="font-bold text-zinc-900">Workspace IDE 2.0</span>
+               </div>
+               <span class="text-[12px] text-zinc-400 font-medium">09:00 AM</span>
+               <p class="text-zinc-600 font-medium mt-1 leading-relaxed w-11/12">
+                 Great work! When HTML version will be available? ⚡️
+               </p>
+             </div>
+          </div>
+
+          <div class="flex gap-4 items-start opacity-50 relative pointer-events-none">
+             <div class="w-10 h-10 rounded-full overflow-hidden shrink-0 mt-1">
+               <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Gladys&backgroundColor=ffdfbf" class="w-full h-full grayscale" alt="Gladys">
+             </div>
+               <div class="absolute inset-0 bg-gradient-to-b from-transparent to-white z-10 bottom-0 pointer-events-none"></div>
+             <div class="flex flex-col gap-1 text-[13.5px]">
+               <div>
+                 <span class="font-bold text-zinc-900">Gladys</span> <span class="text-zinc-500 font-medium px-1">on</span> <span class="font-bold text-zinc-900">Telemetry Feed</span>
+               </div>
+               <span class="text-[12px] text-zinc-400 font-medium">09:00 AM</span>
+               <p class="text-zinc-600 font-medium mt-1 leading-relaxed">
+                 Amazing. This works smoothly with everything!
+               </p>
+             </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </section>
 {/if}

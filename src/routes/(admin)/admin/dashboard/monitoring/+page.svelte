@@ -13,6 +13,8 @@
     RefreshCw,
     Search,
     X,
+    ArrowRightLeft,
+    Clipboard
   } from "lucide-svelte";
   import type {
     AdminSnapshot,
@@ -27,6 +29,7 @@
     riskTone,
     statusTone,
   } from "$lib/admin/hostDashboard";
+  import Chart from "$lib/components/admin/Chart.svelte";
   import {
     formatDateTime,
     formatDuration,
@@ -423,7 +426,7 @@
 
       <!-- Team Detail Drawer -->
       {#if isDrawerOpen}
-        <div class="fixed inset-0 z-50 flex justify-end">
+        <div class="fixed inset-0 lg:left-60 z-50 flex items-end">
           <button 
             type="button"
             aria-label="Close drawer"
@@ -434,10 +437,13 @@
           ></button>
           
           <div 
-            transition:fly={{ x: 448, duration: 300 }}
-            class="relative z-50 w-full max-w-md bg-white shadow-2xl dark:bg-zinc-900 overflow-y-auto border-l border-zinc-200 dark:border-zinc-800 flex flex-col h-full right-0"
+            transition:fly={{ y: 800, duration: 300 }}
+            class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border-t border-zinc-200 dark:border-zinc-800 flex flex-col h-[85vh] sm:h-[calc(100vh-4rem)] rounded-t-2xl"
           >
-             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-5 bg-zinc-50 dark:bg-zinc-900/80 sticky top-0 z-10 hidden sm:flex">
+             <div class="sticky top-0 z-20 flex w-full items-center justify-center bg-white pt-3 pb-1 dark:bg-zinc-900">
+               <div class="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+             </div>
+             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10 hidden sm:flex">
                 <div class="flex flex-col gap-1">
                   <h2 class="text-lg font-bold text-zinc-900 dark:text-white">Team detail view</h2>
                   <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Analytics</p>
@@ -469,22 +475,50 @@
                      {/if}
                    </div>
 
-                   <div class="grid grid-cols-2 gap-4">
+                   <div class="grid grid-cols-2 gap-4 mt-6">
+                     <div class="col-span-2 rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 dark:bg-zinc-800/20 flex flex-col items-center justify-center">
+                       <p class="text-[10px] font-semibold uppercase w-full tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Time Allocation</p>
+                       <div class="h-32 w-full max-w-[200px]">
+                         <Chart 
+                           type="doughnut" 
+                           data={{
+                             labels: ['Online Time', 'Offline Time'],
+                             datasets: [{
+                               data: [activeTeam.reportData.summary.totalOnlineTime, activeTeam.reportData.summary.totalOfflineTime],
+                               backgroundColor: ['#10b981', '#ef4444'],
+                               borderWidth: 0,
+                               hoverOffset: 4
+                             }]
+                           }}
+                           options={{
+                             responsive: true,
+                             maintainAspectRatio: false,
+                             cutout: '70%',
+                             plugins: {
+                               legend: { display: false }
+                             }
+                           }}
+                         />
+                       </div>
+                       <div class="flex gap-4 mt-2 w-full justify-center">
+                         <div class="flex items-center gap-1.5">
+                           <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
+                           <span class="text-[10px] font-medium text-zinc-600 dark:text-zinc-400">Online: {Math.round(activeTeam.reportData.summary.totalOnlineTime / 60)}m</span>
+                         </div>
+                         <div class="flex items-center gap-1.5">
+                           <div class="w-1.5 h-1.5 rounded-full bg-red-500"></div>
+                           <span class="text-[10px] font-medium text-zinc-600 dark:text-zinc-400">Offline: {Math.round(activeTeam.reportData.summary.totalOfflineTime / 60)}m</span>
+                         </div>
+                       </div>
+                     </div>
+
                      <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 dark:bg-zinc-800/20">
                        <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">IDE focus</p>
                        <p class="mt-1 text-2xl font-bold text-zinc-900 dark:text-white">{activeTeam.reportData.summary.percentInIDE}%</p>
                      </div>
                      <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 dark:bg-zinc-800/20">
-                       <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Online</p>
-                       <p class="mt-1 text-2xl font-bold text-zinc-900 dark:text-white">{activeTeam.reportData.summary.percentOnline}%</p>
-                     </div>
-                     <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 dark:bg-zinc-800/20">
                        <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">App switches</p>
-                       <p class="mt-1 text-2xl font-bold text-zinc-900 dark:text-white">{activeTeam.risk.appBlurCount}</p>
-                     </div>
-                     <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 dark:bg-zinc-800/20">
-                       <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">Ext pastes</p>
-                       <p class="mt-1 text-2xl font-bold text-zinc-900 dark:text-white">{activeTeam.risk.extPasteCount}</p>
+                       <p class="mt-1 text-2xl font-bold text-zinc-900 dark:text-white">{activeTeam.risk.appSwitchCount}</p>
                      </div>
                    </div>
 
@@ -503,37 +537,93 @@
 
                    <div class="border-l-2 border-zinc-200 pl-4 py-1 dark:border-zinc-800">
                      <p class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Top applications</p>
-                     <div class="space-y-1.5">
-                       {#if activeTeam.reportData.appUsage.length}
+                     
+                     {#if activeTeam.reportData.appUsage.length}
+                       <div class="mb-4 h-48 w-full max-w-xs mx-auto">
+                         <Chart 
+                           type="doughnut" 
+                           data={{
+                             labels: activeTeam.reportData.appUsage.slice(0, 5).map(app => app.appName),
+                             datasets: [{
+                               data: activeTeam.reportData.appUsage.slice(0, 5).map(app => app.totalTime),
+                               backgroundColor: [
+                                 '#4f46e5', '#ec4899', '#f59e0b', '#10b981', '#6366f1'
+                               ],
+                               borderWidth: 0,
+                               hoverOffset: 4
+                             }]
+                           }}
+                           options={{
+                             responsive: true,
+                             maintainAspectRatio: false,
+                             plugins: {
+                               legend: { display: false },
+                               tooltip: {
+                                 callbacks: {
+                                   label: function(context: any) {
+                                     let value = context.raw || 0;
+                                     const m = Math.floor(value / 60);
+                                     const s = value % 60;
+                                     return context.label + ': ' + (m > 0 ? `${m}m ` : '') + `${s}s`;
+                                   }
+                                 }
+                               }
+                             }
+                           }}
+                         />
+                       </div>
+                       
+                       <div class="space-y-1.5">
                          {#each activeTeam.reportData.appUsage.slice(0, 5) as app}
                            <div class="flex items-center justify-between border-b border-zinc-100 py-2 dark:border-zinc-800/60">
-                             <span class="text-xs font-medium text-zinc-700 dark:text-zinc-300">{app.appName}</span>
+                             <div class="flex items-center gap-2">
+                               <div class="w-2 h-2 rounded-full" style="background-color: {['#4f46e5', '#ec4899', '#f59e0b', '#10b981', '#6366f1'][activeTeam.reportData.appUsage.indexOf(app) % 5]}"></div>
+                               <span class="text-xs font-medium text-zinc-700 dark:text-zinc-300">{app.appName}</span>
+                             </div>
                              <span class="text-xs font-semibold text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-2 py-0.5 rounded">{formatDuration(app.totalTime)}</span>
                            </div>
                          {/each}
-                       {:else}
-                         <p class="text-xs text-zinc-400 dark:text-zinc-500 italic">No application usage summary available yet.</p>
-                       {/if}
-                     </div>
+                       </div>
+                     {:else}
+                       <p class="text-xs text-zinc-400 dark:text-zinc-500 italic">No application usage summary available yet.</p>
+                     {/if}
                    </div>
 
-                   <div class="border-l-2 border-zinc-200 pl-4 py-1 dark:border-zinc-800">
-                     <p class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Recent activity events</p>
-                     <div class="space-y-3">
+                   <div class="relative border-l-2 border-zinc-200 pl-6 py-2 dark:border-zinc-800 ml-2">
+                     <div class="absolute -left-[5px] top-3 w-2 h-2 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+                     <p class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-4">Recent activity events</p>
+                     
+                     <div class="space-y-4">
                        {#if (activeTeam.syncData.activityEvents || []).length}
                          {#each [...(activeTeam.syncData.activityEvents || [])].slice(-6).reverse() as event}
-                           <div class="border-b border-zinc-100 pb-3 dark:border-zinc-800/60 transition-colors group">
-                             <div class="flex items-center justify-between gap-4">
-                               <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200">{formatEventType(event.type)}</p>
-                               <p class="text-[10px] tracking-wide text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-500 transition-colors">{formatDateTime(event.timestamp)}</p>
+                           <div class="relative group">
+                             <div class="absolute -left-[31px] mt-1.5 w-[7px] h-[7px] rounded-full {event.type === 'app_switch' || event.type === 'app_blur' ? 'bg-amber-400' : event.type.includes('paste') ? 'bg-red-400' : 'bg-indigo-400'} ring-4 ring-white dark:ring-zinc-900 transition-transform group-hover:scale-125"></div>
+                             <div class="rounded-lg border border-zinc-100 bg-white p-3 shadow-xs dark:border-zinc-800/60 dark:bg-zinc-900/50 transition-all hover:border-zinc-200 dark:hover:border-zinc-700 hover:shadow-sm">
+                               <div class="flex items-center justify-between gap-4 mb-1.5">
+                                 <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
+                                   {#if event.type === 'app_switch' || event.type === 'app_blur'}
+                                     <ArrowRightLeft size={12} class="text-amber-500" />
+                                   {:else if event.type.includes('paste')}
+                                     <Clipboard size={12} class="text-red-500" />
+                                   {:else}
+                                     <Activity size={12} class="text-indigo-500" />
+                                   {/if}
+                                   {formatEventType(event.type)}
+                                 </p>
+                                 <p class="text-[10px] tracking-wide text-zinc-400 dark:text-zinc-500 font-medium whitespace-nowrap">{formatDateTime(event.timestamp)}</p>
+                               </div>
+                               {#if event.details}
+                                 <p class="text-[11px] leading-relaxed text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800/50 rounded p-2 mt-2 font-mono">
+                                   {event.details}
+                                 </p>
+                               {/if}
                              </div>
-                             {#if event.details}
-                               <p class="mt-1 text-[11px] leading-relaxed text-zinc-500 dark:text-zinc-400 border-l-2 border-zinc-200 dark:border-zinc-700 pl-2 mt-1.5">{event.details}</p>
-                             {/if}
                            </div>
                          {/each}
                        {:else}
-                         <p class="text-xs text-zinc-400 dark:text-zinc-500 italic">No event timeline available from the latest snapshot.</p>
+                         <div class="rounded-lg border border-dashed border-zinc-200 px-4 py-6 text-center dark:border-zinc-800">
+                           <p class="text-xs text-zinc-400 dark:text-zinc-500 italic">No event timeline available from the latest snapshot.</p>
+                         </div>
                        {/if}
                      </div>
                    </div>

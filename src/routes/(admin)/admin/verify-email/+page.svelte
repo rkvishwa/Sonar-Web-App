@@ -155,11 +155,11 @@
         </div>
       </div>
 
-      <div class="grid gap-3 sm:grid-cols-2">
+      <div class="flex flex-col gap-3">
         <button
           type="button"
           onclick={handleResend}
-          class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 dark:border-white/10 dark:bg-white/4 dark:text-slate-100 dark:hover:bg-white/10"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-800 transition-colors hover:bg-slate-50 dark:border-white/10 dark:bg-white/4 dark:text-slate-100 dark:hover:bg-white/10"
           disabled={sending || refreshing}
         >
           {#if sending}
@@ -173,7 +173,7 @@
         <button
           type="button"
           onclick={handleRefresh}
-          class="inline-flex items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-70"
+          class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-slate-800 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200 disabled:cursor-not-allowed disabled:opacity-70"
           disabled={refreshing || sending}
         >
           {#if refreshing}
@@ -189,7 +189,7 @@
       <button
         type="button"
         onclick={handleSignOut}
-        class="inline-flex items-center justify-center rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-rose-300 hover:text-rose-700 dark:border-white/10 dark:bg-white/4 dark:text-slate-200 dark:hover:border-rose-400/35 dark:hover:text-rose-300"
+        class="inline-flex w-full items-center justify-center rounded-lg border border-rose-200 bg-rose-500/10 px-4 py-2.5 text-sm font-semibold text-rose-700 transition-colors hover:bg-rose-500/20 hover:text-rose-800 dark:border-rose-500/20 dark:bg-rose-500/10 dark:text-rose-400 dark:hover:bg-rose-500/20 dark:hover:text-rose-300"
       >
         Sign out
       </button>

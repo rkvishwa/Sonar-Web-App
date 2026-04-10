@@ -145,6 +145,7 @@ export interface RiskSummary {
   onlineCount: number;
   extPasteCount: number;
   appBlurCount: number;
+  appSwitchCount: number;
 }
 
 export interface TeamMonitor extends SessionRecord {

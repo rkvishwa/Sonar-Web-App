@@ -6,11 +6,10 @@
     Activity,
     Settings,
     LogOut,
-    ShieldAlert,
-    UserCircle,
-    ChevronLeft,
     Menu,
     X,
+    PanelLeftClose,
+    PanelLeftOpen
   } from "lucide-svelte";
   import { signOut } from "$lib/admin/auth";
   import { goto } from "$app/navigation";
@@ -19,9 +18,14 @@
   let { children } = $props();
 
   let isMobileSidebarOpen = $state(false);
+  let isSidebarCollapsed = $state(false);
 
   function toggleMobileSidebar() {
     isMobileSidebarOpen = !isMobileSidebarOpen;
+  }
+
+  function toggleSidebar() {
+    isSidebarCollapsed = !isSidebarCollapsed;
   }
 
   // Close sidebar on navigation (for mobile)
@@ -49,16 +53,14 @@
   }
 </script>
 
-<div class="flex h-screen w-full overflow-hidden font-sans text-zinc-900 dark:text-zinc-100 bg-zinc-100 dark:bg-zinc-950">
+<div class="flex h-screen w-full overflow-hidden font-sans text-zinc-900 dark:text-zinc-100 bg-zinc-50 dark:bg-zinc-950">
 
   <!-- Mobile Header -->
-  <div class="flex h-14 items-center justify-between border-b border-zinc-200 bg-white px-4 dark:border-zinc-800 dark:bg-zinc-900 lg:hidden shrink-0 w-full fixed top-0 z-40">
-    <div class="flex items-center space-x-3 text-base font-bold">
-      <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-        <ShieldAlert size={16} />
-      </div>
+  <div class="flex h-14 items-center justify-between border-b border-zinc-200 bg-white px-4 dark:border-zinc-800 dark:bg-zinc-900 lg:hidden shrink-0 w-full fixed top-0 z-40 shadow-sm">
+    <a href="/" title="Back to Main Site" class="flex items-center space-x-[6px] text-[15px] font-bold">
+      <img src="/favicon.png" alt="Sonar Logo" class="h-[22px] w-[22px] object-contain" />
       <span class="text-zinc-900 dark:text-white font-semibold tracking-wide">Sonar Host</span>
-    </div>
+    </a>
     <div class="flex flex-row items-center gap-2">
       <ThemeToggle />
       <button onclick={toggleMobileSidebar} class="rounded-lg p-2 text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 shrink-0">
@@ -73,68 +75,81 @@
 
   <!-- Sidebar Container -->
   <aside
-    class={`fixed inset-y-0 left-0 z-50 flex w-60 flex-col border-r border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 transition-transform duration-300 text-zinc-700 dark:text-zinc-300 lg:static lg:translate-x-0 ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"}`}
+    class={`fixed inset-y-0 left-0 z-50 flex flex-col border-r border-zinc-200 bg-white dark:border-zinc-800/60 dark:bg-zinc-900/80 backdrop-blur-xl transition-all duration-300 ease-in-out text-zinc-700 dark:text-zinc-300 lg:static lg:translate-x-0 ${isMobileSidebarOpen ? "translate-x-0 w-60" : "-translate-x-full lg:translate-x-0"} ${isSidebarCollapsed ? "lg:w-20" : "lg:w-60"}`}
   >
-    <div class="flex h-14 shrink-0 items-center justify-between px-5 border-b border-zinc-200 dark:border-zinc-800 hidden lg:flex">
-      <div class="flex items-center space-x-3 text-base font-bold">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-indigo-600 text-white">
-          <ShieldAlert size={16} />
-        </div>
-        <span class="text-zinc-900 dark:text-white font-semibold tracking-wide">Sonar Host</span>
+    <!-- Logo area -->
+    <div class={`flex shrink-0 items-center border-b border-zinc-200 dark:border-zinc-800 hidden lg:flex ${isSidebarCollapsed ? "flex-col py-4 space-y-4 px-0" : "h-14 px-4 justify-between"}`}>
+      <a href="/" class="flex items-center space-x-[6px] text-[15px] font-bold overflow-hidden" title="Back to Main Site">
+        <img src="/favicon.png" alt="Sonar Logo" class="h-[22px] w-[22px] object-contain shrink-0" />
+        {#if !isSidebarCollapsed}
+          <span class="text-zinc-900 dark:text-white font-semibold tracking-wide whitespace-nowrap transition-opacity duration-300">Sonar Host</span>
+        {/if}
+      </a>
+      
+      <!-- Actions: Theme Switch and Minimize -->
+      <div class={`flex items-center ${isSidebarCollapsed ? "flex-col space-y-3" : "gap-1"}`}>
+        <ThemeToggle />
+        <button 
+          onclick={toggleSidebar} 
+          class="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+          title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          {#if isSidebarCollapsed}
+            <PanelLeftOpen size={18} />
+          {:else}
+            <PanelLeftClose size={18} />
+          {/if}
+        </button>
       </div>
-      <ThemeToggle />
     </div>
 
+    <!-- Mobile-only controls matching desktop theme -->
     <div class="flex items-center p-4 lg:hidden border-b border-zinc-200 dark:border-zinc-800">
       <ThemeToggle />
     </div>
 
-    <nav class="flex-1 space-y-0.5 px-3 py-4 overflow-y-auto w-full">
+    <!-- Navigation -->
+    <nav class="flex-1 space-y-1.5 px-3 py-4 overflow-y-auto w-full custom-scrollbar">
       {#each navItems as item}
         <a
           href={item.href}
           onclick={() => {
             isMobileSidebarOpen = false;
           }}
-          class={`flex items-center space-x-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors ${
+          title={isSidebarCollapsed ? item.name : ""}
+          class={`flex items-center group rounded-xl px-3 py-3 text-sm font-medium transition-all duration-200 relative ${
             isActiveItem(item.href)
-              ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300"
-              : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white"
-          }`}
+              ? "bg-indigo-50/80 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400"
+              : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-white"
+          } ${isSidebarCollapsed ? "justify-center" : "space-x-3"}`}
         >
-          <item.icon size={17} />
-          <span>{item.name}</span>
+          <item.icon size={18} class={`transition-transform duration-200 ${isActiveItem(item.href) ? "scale-110" : "group-hover:scale-110"}`} />
+          {#if !isSidebarCollapsed}
+            <span class="whitespace-nowrap">{item.name}</span>
+          {/if}
         </a>
       {/each}
     </nav>
 
-    <div class="border-t border-zinc-200 dark:border-zinc-800 p-4 bg-white dark:bg-zinc-900">
-      <div class="mb-2 flex items-center space-x-3 px-2 py-2">
-        <UserCircle size={30} class="text-zinc-400 dark:text-zinc-500" />
-        <div class="flex-1 overflow-hidden">
-          <p class="truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">Web Host</p>
-          <p class="truncate text-xs text-zinc-500 dark:text-zinc-400 mt-0.5">Host Account</p>
-        </div>
-      </div>
+    <!-- Bottom Actions -->
+    <div class="border-t border-zinc-200 dark:border-zinc-800 p-4">
       <button
         onclick={handleSignOut}
-        class="flex w-full items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800 dark:hover:text-white cursor-pointer"
+        title={isSidebarCollapsed ? "Sign out" : ""}
+        class={`flex w-full items-center rounded-xl p-3 text-sm font-medium text-zinc-600 transition-all duration-200 hover:bg-rose-50 hover:text-rose-600 dark:text-zinc-400 dark:hover:bg-rose-500/10 dark:hover:text-rose-400 cursor-pointer ${isSidebarCollapsed ? "justify-center" : "space-x-3"}`}
       >
-        <LogOut size={16} />
-        <span>Sign out</span>
+        <LogOut size={18} />
+        {#if !isSidebarCollapsed}
+          <span class="whitespace-nowrap">Sign out</span>
+        {/if}
       </button>
-      <div class="mt-2 px-3 text-xs text-zinc-400 dark:text-zinc-500">
-        <a href="/" class="flex items-center gap-1 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors">
-          <ChevronLeft size={13} /> Back to Main Site
-        </a>
-      </div>
     </div>
   </aside>
 
   <!-- Overlay for mobile sidebar -->
   {#if isMobileSidebarOpen}
     <div
-      class="fixed inset-0 z-40 bg-black/40 lg:hidden"
+      class="fixed inset-0 z-40 bg-zinc-900/40 backdrop-blur-sm lg:hidden transition-opacity"
       onclick={toggleMobileSidebar}
       onkeydown={(e) => {if(e.key === 'Escape') toggleMobileSidebar()}}
       role="button"
@@ -144,7 +159,7 @@
   {/if}
 
   <!-- Main Content Area -->
-  <main class="flex flex-1 flex-col overflow-y-auto z-10 pt-14 lg:pt-0 custom-scrollbar">
+  <main class="flex flex-1 flex-col overflow-y-auto z-10 pt-14 lg:pt-0 custom-scrollbar bg-white dark:bg-zinc-950 shadow-sm rounded-tl-xl lg:mt-2 lg:mr-2 lg:mb-2 border border-zinc-200 dark:border-zinc-800/50">
     {@render children()}
   </main>
 </div>
@@ -158,10 +173,16 @@
     background: transparent;
   }
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #d4d4d8;
-    border-radius: 4px;
+    background: #e4e4e7;
+    border-radius: 9999px;
   }
   .dark .custom-scrollbar::-webkit-scrollbar-thumb {
     background: #3f3f46;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #d4d4d8;
+  }
+  .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #52525b;
   }
 </style>

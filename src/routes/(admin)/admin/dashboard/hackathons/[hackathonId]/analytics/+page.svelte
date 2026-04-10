@@ -389,7 +389,7 @@
     <!-- Team Detail Drawer -->
     {#if isDrawerOpen && selectedTeam()}
       {@const activeTeam = selectedTeam()!}
-      <div class="fixed inset-0 z-50 flex justify-end">
+      <div class="fixed inset-0 lg:left-60 z-50 flex items-end">
         <!-- Backdrop -->
         <button 
           type="button" 
@@ -402,10 +402,13 @@
         
         <!-- Drawer panel -->
         <div 
-          transition:fly={{ x: 512, duration: 300 }}
-          class="relative z-50 w-full max-w-lg bg-white shadow-2xl dark:bg-zinc-900 overflow-y-auto border-l border-zinc-200 dark:border-zinc-800 flex flex-col h-full right-0"
+          transition:fly={{ y: 800, duration: 300 }}
+          class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border-t border-zinc-200 dark:border-zinc-800 flex flex-col h-[90vh] sm:h-[calc(100vh-4rem)] rounded-t-2xl"
         >
-          <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-5 bg-zinc-50 dark:bg-zinc-900/80 sticky top-0 z-10">
+          <div class="sticky top-0 z-20 flex w-full items-center justify-center bg-white pt-3 pb-1 dark:bg-zinc-900">
+            <div class="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+          </div>
+          <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10">
             <div>
               <div class="flex items-center gap-3">
                 <h2 class="text-lg font-bold text-zinc-900 dark:text-white">{activeTeam.teamName}</h2>
@@ -437,7 +440,7 @@
                 </div>
                 <div class="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
                   <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">App switches</p>
-                  <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">{activeTeam.risk.appBlurCount}</p>
+                  <p class="mt-2 text-3xl font-bold text-zinc-900 dark:text-white">{activeTeam.risk.appSwitchCount}</p>
                 </div>
                 <div class="rounded-lg border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 dark:bg-zinc-900/50">
                   <p class="text-xs font-medium text-zinc-500 dark:text-zinc-400">External pastes</p>

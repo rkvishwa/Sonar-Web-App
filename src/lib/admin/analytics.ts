@@ -323,6 +323,7 @@ export function computeRiskScore(
     onlineCount,
     extPasteCount,
     appBlurCount,
+    appSwitchCount: appBlurCount,
   };
 }
 

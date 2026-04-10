@@ -37,12 +37,13 @@
 <button
   type="button"
   onclick={toggleTheme}
-  class="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-200/70 dark:border-cyan-400/25 bg-white/75 dark:bg-cyan-500/10 text-zinc-600 hover:text-cyan-700 dark:text-zinc-300 dark:hover:text-cyan-300 hover:bg-cyan-50 dark:hover:bg-cyan-500/15 transition-colors cursor-pointer"
+  class="p-1.5 rounded-lg text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:text-zinc-100 dark:hover:bg-zinc-800 transition-colors cursor-pointer"
+  title="Toggle theme"
   aria-label="Toggle theme"
 >
   {#if currentTheme === "light"}
-    <Moon size={20} />
+    <Moon size={18} />
   {:else}
-    <Sun size={20} />
+    <Sun size={18} />
   {/if}
 </button>

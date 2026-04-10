@@ -11,6 +11,11 @@
     Plus,
     RefreshCw,
     X,
+    Search,
+    Calendar,
+    Settings,
+    BarChart3,
+    Eye
   } from "lucide-svelte";
   import {
     createHackathon,
@@ -50,6 +55,22 @@
 
   let isDrawerOpen = $state(false);
   let copiedId = $state("");
+
+  let searchQuery = $state("");
+  let startDateFilter = $state("");
+  let endDateFilter = $state("");
+  let statusFilter = $state("");
+
+  let filteredHackathons = $derived(
+    hackathons.filter((h) => {
+      const q = searchQuery.toLowerCase();
+      const matchSearch = !q || h.name.toLowerCase().includes(q) || h.hackathonId.toLowerCase().includes(q);
+      const matchStart = !startDateFilter || (h.startDate && h.startDate >= startDateFilter);
+      const matchEnd = !endDateFilter || (h.endDate && h.endDate <= endDateFilter);
+      const matchStatus = !statusFilter || h.status === statusFilter;
+      return matchSearch && matchStart && matchEnd && matchStatus;
+    })
+  );
 
   function toggleDrawer() {
     isDrawerOpen = !isDrawerOpen;
@@ -218,8 +239,50 @@
             </button>
           </div>
         </div>
+      </div>
 
-
+      <div class="flex flex-col sm:flex-row gap-4 mb-2">
+        <div class="relative flex-[2]">
+          <Search size={16} class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+          <input
+            bind:value={searchQuery}
+            type="text"
+            placeholder="Search by name or ID..."
+            class="w-full pl-9 pr-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm text-zinc-900 dark:text-zinc-100 transition-shadow"
+          />
+        </div>
+        <div class="flex gap-2 flex-[1.5]">
+          <div class="relative w-full min-w-[100px]">
+            <select
+              bind:value={statusFilter}
+              class="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm text-zinc-900 dark:text-zinc-100 transition-shadow appearance-none cursor-pointer"
+            >
+              <option value="">All Statuses</option>
+              <option value="draft">Draft</option>
+              <option value="live">Live</option>
+              <option value="archived">Archived</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-zinc-500">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+            </div>
+          </div>
+          <div class="relative w-full">
+            <Calendar size={14} class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <input
+              bind:value={startDateFilter}
+              type="date"
+              class="w-full pl-8 pr-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm text-zinc-600 dark:text-zinc-300 placeholder-zinc-400 transition-shadow"
+            />
+          </div>
+          <div class="relative w-full">
+            <Calendar size={14} class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+            <input
+              bind:value={endDateFilter}
+              type="date"
+              class="w-full pl-8 pr-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm text-zinc-600 dark:text-zinc-300 placeholder-zinc-400 transition-shadow"
+            />
+          </div>
+        </div>
       </div>
 
       {#if dashboardError}
@@ -264,29 +327,40 @@
             Create your first event
           </button>
         </div>
+      {:else if filteredHackathons.length === 0}
+        <div class="rounded-lg border border-dashed border-zinc-200 py-12 text-center text-sm text-zinc-400 dark:border-zinc-700 dark:text-zinc-500 mt-6">
+          <p>No hackathons match your search and filter criteria.</p>
+          <button
+            type="button"
+            onclick={() => { searchQuery = ''; startDateFilter = ''; endDateFilter = ''; statusFilter = ''; }}
+            class="mt-4 text-indigo-600 dark:text-indigo-400 hover:underline font-medium"
+          >
+            Clear filters
+          </button>
+        </div>
       {:else}
-        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white/50 dark:border-zinc-800 dark:bg-zinc-900/50 shadow-sm mt-4">
+        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/40 shadow-sm mt-4">
           <table class="w-full text-left text-sm text-zinc-600 dark:text-zinc-400 whitespace-nowrap lg:whitespace-normal">
-            <thead class="bg-zinc-50 border-b border-zinc-200 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/80 dark:text-zinc-400">
+            <thead class="bg-zinc-50/80 border-b border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-400">
               <tr>
                 <th scope="col" class="px-6 py-4">Hackathon</th>
                 <th scope="col" class="px-6 py-4">Status</th>
-                <th scope="col" class="px-6 py-4">Dates</th>
-                <th scope="col" class="px-6 py-4">Settings</th>
+                <th scope="col" class="px-6 py-4">Start</th>
+                <th scope="col" class="px-6 py-4">End</th>
                 <th scope="col" class="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
             <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {#each hackathons as entry}
-                <tr class="transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40">
-                  <td class="px-6 py-4">
-                    <div class="font-bold text-zinc-900 dark:text-white mb-1">{entry.name}</div>
+              {#each filteredHackathons as entry}
+                <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/60 group/row">
+                  <td class="px-6 py-5 align-middle">
+                    <div class="font-bold text-zinc-900 dark:text-white text-[15px] mb-1">{entry.name}</div>
                     <div class="flex items-center gap-2 group/id">
-                      <div class="text-[11px] font-mono tracking-wider text-indigo-600 dark:text-indigo-400">{entry.hackathonId}</div>
+                      <div class="text-[11px] font-mono tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">{entry.hackathonId}</div>
                       <button 
                         type="button"
                         onclick={() => copyToClipboard(entry.hackathonId)}
-                        class="opacity-0 group-hover/id:opacity-100 transition-opacity p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 cursor-pointer"
+                        class="opacity-0 group-hover/id:opacity-100 transition-opacity p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 cursor-pointer"
                         title="Copy ID"
                       >
                         {#if copiedId === entry.hackathonId}
@@ -296,39 +370,42 @@
                         {/if}
                       </button>
                     </div>
-                    {#if entry.description}
-                      <p class="mt-1.5 text-xs text-zinc-500 dark:text-zinc-500 line-clamp-1 max-w-[200px] sm:max-w-xs">{entry.description}</p>
-                    {/if}
                   </td>
-                  <td class="px-6 py-4 align-top">
-                    <span class={`inline-block mt-0.5 rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${
+                  <td class="px-6 py-5 align-middle">
+                    <span class={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
                       entry.status === "live"
-                        ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-300"
+                        ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-400"
                         : entry.status === "archived"
                           ? "border-zinc-200 bg-zinc-100 text-zinc-600 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-400"
-                          : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-300"
+                          : "border-amber-200 bg-amber-50 text-amber-700 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-400"
                     }`}>
+                      {#if entry.status === "live"}
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                      {:else if entry.status === "archived"}
+                        <span class="w-1.5 h-1.5 rounded-full bg-zinc-400"></span>
+                      {:else}
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                      {/if}
                       {entry.status}
                     </span>
                   </td>
-                  <td class="px-6 py-4 text-[13px] align-top space-y-1.5">
-                    <div><span class="font-medium text-zinc-400 dark:text-zinc-600">Start:</span> {entry.startDate ? formatDateTime(entry.startDate) : "TBD"}</div>
-                    <div><span class="font-medium text-zinc-400 dark:text-zinc-600">End:</span> {entry.endDate ? formatDateTime(entry.endDate) : "TBD"}</div>
+                  <td class="px-6 py-5 align-middle">
+                    <span class="text-[13px] font-medium text-zinc-900 dark:text-zinc-100">{entry.startDate ? formatDateTime(entry.startDate) : "—"}</span>
                   </td>
-                  <td class="px-6 py-4 text-[13px] text-zinc-500 dark:text-zinc-400 align-top space-y-1.5">
-                    <div>{entry.settings.blockInternetAccess ? "Internet blocked" : "Internet allowed"}</div>
-                    <div>{entry.settings.blockNonEmptyWorkspace ? "Empty workspace required" : "Existing files allowed"}</div>
+                  <td class="px-6 py-5 align-middle">
+                    <span class="text-[13px] font-medium text-zinc-900 dark:text-zinc-100">{entry.endDate ? formatDateTime(entry.endDate) : "—"}</span>
                   </td>
-                  <td class="px-6 py-4 text-right align-top">
-                    <div class="flex items-center justify-end gap-3 text-[13px] font-medium text-indigo-600 dark:text-indigo-400 pt-1">
-                      <a href={buildHackathonRoute(entry.hackathonId)} class="hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
+                  <td class="px-6 py-5 text-right align-middle">
+                    <div class="flex items-center justify-end gap-2">
+                      <a href={buildHackathonRoute(entry.hackathonId)} class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 shadow-sm" title="Overview">
+                        <Eye size={14} class="text-zinc-400" />
                         Overview
                       </a>
-                      <a href={buildHackathonRoute(entry.hackathonId, "analytics")} class="hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
-                        Analytics
+                      <a href={buildHackathonRoute(entry.hackathonId, "analytics")} class="inline-flex items-center justify-center p-1.5 rounded-lg border border-transparent text-zinc-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-500/10 dark:hover:text-indigo-400 transition-colors" title="Analytics">
+                        <BarChart3 size={16} />
                       </a>
-                      <a href={buildHackathonRoute(entry.hackathonId, "settings")} class="hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors">
-                        Settings
+                      <a href={buildHackathonRoute(entry.hackathonId, "settings")} class="inline-flex items-center justify-center p-1.5 rounded-lg border border-transparent text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 dark:hover:bg-zinc-800 dark:hover:text-white transition-colors" title="Settings">
+                        <Settings size={16} />
                       </a>
                     </div>
                   </td>
@@ -340,7 +417,7 @@
       {/if}
 
       {#if isDrawerOpen}
-        <div class="fixed inset-0 z-50 flex justify-end">
+        <div class="fixed inset-0 lg:left-60 z-50 flex items-end">
           <!-- Backdrop -->
           <button 
             type="button" 
@@ -353,10 +430,13 @@
           
           <!-- Drawer panel -->
           <div 
-            transition:fly={{ x: 448, duration: 300 }}
-            class="relative z-50 w-full max-w-md bg-white shadow-2xl dark:bg-zinc-900 overflow-y-auto border-l border-zinc-200 dark:border-zinc-800 flex flex-col h-full right-0"
+            transition:fly={{ y: 800, duration: 300 }}
+            class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border-t border-zinc-200 dark:border-zinc-800 flex flex-col h-[90vh] sm:h-[calc(100vh-4rem)] rounded-t-2xl"
           >
-             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-5 bg-zinc-50 dark:bg-zinc-900/80 sticky top-0 z-10">
+             <div class="sticky top-0 z-20 flex w-full items-center justify-center bg-white pt-3 pb-1 dark:bg-zinc-900">
+               <div class="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
+             </div>
+             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10">
                 <div>
                   <h2 class="text-lg font-bold text-zinc-900 dark:text-white">Create an event workspace</h2>
                   <p class="text-xs text-zinc-500 mt-1 dark:text-zinc-400">Start configuring a new hackathon.</p>
