@@ -10,6 +10,7 @@
     Save,
     Search,
     ShieldAlert,
+    Palette
   } from "lucide-svelte";
   import { updateGlobalSettings } from "$lib/admin/api";
   import {
@@ -36,11 +37,84 @@
   let refreshing = $state(false);
   let savingGlobalSettings = $state(false);
   let updatingPassword = $state(false);
-  let activeTab = $state<"global" | "account">("global");
+  let activeTab = $state<"global" | "account" | "appearance">("global");
   let searchQuery = $state("");
   let searchLower = $derived(searchQuery.toLowerCase());
   let matchesGlobal = $derived(searchLower === "" || "global default hackathon internet empty workspace network".includes(searchLower));
   let matchesAccount = $derived(searchLower === "" || "account security password profile email".includes(searchLower));
+  let matchesAppearance = $derived(searchLower === "" || "appearance theme color mode dark light system accent default".includes(searchLower));
+
+  let currentTheme = $state<"light" | "dark" | "system">("system");
+  let currentAccent = $state<string>("#4f46e5");
+
+  const defaultAccents = [
+    { label: "Indigo (Default)", value: "#4f46e5" },
+    { label: "Blue", value: "#3b82f6" },
+    { label: "Violet", value: "#8b5cf6" },
+    { label: "Emerald", value: "#10b981" },
+    { label: "Rose", value: "#f43f5e" },
+    { label: "Amber", value: "#f59e0b" }
+  ];
+
+  function applyTheme(theme: "light" | "dark" | "system") {
+    currentTheme = theme;
+    if (theme === "system") {
+      localStorage.removeItem("theme");
+      if (window.matchMedia("(prefers-color-scheme: dark)").matches) {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    } else {
+      localStorage.theme = theme;
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      } else {
+        document.documentElement.classList.remove("dark");
+      }
+    }
+  }
+
+  function applyAccent(color: string) {
+    currentAccent = color;
+    localStorage.setItem("accentColor", color);
+
+    function mixColors(color1: string, color2: string, weight: number): string {
+      const c1 = [parseInt(color1.slice(1,3),16), parseInt(color1.slice(3,5),16), parseInt(color1.slice(5,7),16)];
+      const c2 = [parseInt(color2.slice(1,3),16), parseInt(color2.slice(3,5),16), parseInt(color2.slice(5,7),16)];
+      const mixed = c1.map((v, i) => Math.round(v * (1 - weight) + c2[i] * weight));
+      return '#' + mixed.map(v => v.toString(16).padStart(2, '0')).join('');
+    }
+
+    const colors = {
+      50: mixColors(color, '#ffffff', 0.95),
+      100: mixColors(color, '#ffffff', 0.9),
+      200: mixColors(color, '#ffffff', 0.75),
+      300: mixColors(color, '#ffffff', 0.6),
+      400: mixColors(color, '#ffffff', 0.3),
+      500: color,
+      600: mixColors(color, '#000000', 0.1),
+      700: mixColors(color, '#000000', 0.3),
+      800: mixColors(color, '#000000', 0.5),
+      900: mixColors(color, '#000000', 0.7),
+      950: mixColors(color, '#000000', 0.85)
+    };
+
+    let style = document.getElementById("accent-theme-override");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "accent-theme-override";
+      document.head.appendChild(style);
+    }
+    
+    let css = ':root { ';
+    Object.entries(colors).forEach(([shade, val]) => {
+      css += `--color-indigo-${shade}: ${val}; `;
+    });
+    css += '}';
+    style.innerHTML = css;
+  }
+
 
   let passwordForm = $state({
     currentPassword: "",
@@ -90,6 +164,19 @@
 
   onMount(() => {
     void loadPage();
+    
+    // Init theme
+    if (localStorage.theme === "light" || localStorage.theme === "dark") {
+      currentTheme = localStorage.theme;
+    } else {
+      currentTheme = "system";
+    }
+
+    // Init accent
+    const savedAccent = localStorage.getItem("accentColor");
+    if (savedAccent) {
+      currentAccent = savedAccent;
+    }
 
     const intervalId = window.setInterval(() => {
       void loadPage({ silent: true });
@@ -269,6 +356,17 @@
           >
             Account & Security
           </button>
+          <button
+            type="button"
+            onclick={() => activeTab = 'appearance'}
+            class={`flex w-full items-center justify-between rounded-md px-4 py-2 text-sm font-medium transition-colors ${
+              activeTab === 'appearance'
+                ? "bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400"
+                : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-100"
+            }`}
+          >
+            Appearance
+          </button>
         </aside>
         {/if}
 
@@ -348,6 +446,80 @@
                   <Save size={14} /> Save Defaults
                 {/if}
               </button>
+            </div>
+          {/if}
+
+          {#if (searchQuery ? matchesAppearance : activeTab === 'appearance')}
+            <!-- Appearance Settings -->
+            <div class="max-w-2xl pb-8">
+              <div class="mb-6 flex items-center gap-3">
+                <div class="rounded-md border border-zinc-200 bg-white p-1.5 shadow-sm dark:border-zinc-700 dark:bg-zinc-800">
+                  <Palette size={16} class="text-zinc-700 dark:text-zinc-300" />
+                </div>
+                <div>
+                  <h2 class="text-base font-semibold text-zinc-900 dark:text-white">Appearance</h2>
+                </div>
+              </div>
+
+              <!-- Theme Selection -->
+              <div class="mb-8">
+                <h3 class="mb-4 text-sm font-medium text-zinc-900 dark:text-zinc-100">Theme Preference</h3>
+                <div class="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    onclick={() => applyTheme('light')}
+                    class={`flex items-center justify-center gap-3 rounded-lg border bg-white p-4 transition-all hover:bg-zinc-50 ${currentTheme === 'light' ? 'border-indigo-600 ring-2 ring-indigo-600 shadow-sm' : 'border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900/50'}`}
+                  >
+                    <span class="text-sm font-medium text-zinc-900 dark:text-zinc-100">Light</span>
+                  </button>
+                  <button
+                    type="button"
+                    onclick={() => applyTheme('dark')}
+                    class={`flex items-center justify-center gap-3 rounded-lg border bg-zinc-900 p-4 transition-all hover:bg-zinc-800 ${currentTheme === 'dark' ? 'border-indigo-600 ring-2 ring-indigo-600 shadow-sm' : 'border-zinc-200 dark:border-zinc-800'}`}
+                  >
+                    <span class="text-sm font-medium text-zinc-100">Dark</span>
+                  </button>
+                  <button
+                    type="button"
+                    onclick={() => applyTheme('system')}
+                    class={`flex items-center justify-center gap-3 rounded-lg border bg-gradient-to-br from-white to-zinc-900 p-4 transition-all hover:opacity-90 ${currentTheme === 'system' ? 'border-indigo-600 ring-2 ring-indigo-600 shadow-sm' : 'border-zinc-200 dark:border-zinc-800'}`}
+                  >
+                    <span class="text-sm font-medium text-zinc-900 drop-shadow-md">System</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Accent Color Selection -->
+              <div>
+                <h3 class="mb-1 text-sm font-medium text-zinc-900 dark:text-zinc-100">Accent Color</h3>
+                <p class="mb-4 text-xs text-zinc-500 dark:text-zinc-400">Choose a primary color applied across the entire site.</p>
+                <div class="flex flex-wrap items-center gap-4">
+                  {#each defaultAccents as accent}
+                    <button
+                      type="button"
+                      title={accent.label}
+                      onclick={() => applyAccent(accent.value)}
+                      class={`relative flex h-10 w-10 items-center justify-center rounded-full transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 ${currentAccent === accent.value ? 'ring-2 ring-indigo-600 ring-offset-2 dark:ring-offset-zinc-950 scale-110' : ''}`}
+                      style="background-color: {accent.value};"
+                    >
+                    </button>
+                  {/each}
+
+                  <!-- Custom Color Picker -->
+                  <div class="relative ml-2 flex items-center gap-3 border-l border-zinc-200 pl-6 dark:border-zinc-800">
+                    <label for="custom-color" class="text-sm font-medium text-zinc-700 dark:text-zinc-300">Custom:</label>
+                    <div class="relative h-10 w-10 overflow-hidden rounded-full shadow-sm ring-1 ring-black/5 dark:ring-white/10">
+                      <input
+                        id="custom-color"
+                        type="color"
+                        value={currentAccent}
+                        onchange={(e) => applyAccent(e.currentTarget.value)}
+                        class="absolute -left-2 -top-2 h-14 w-14 cursor-pointer appearance-none border-0 bg-transparent p-0"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           {/if}
           
