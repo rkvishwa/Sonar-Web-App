@@ -1,13 +1,12 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import { onMount } from "svelte";
+  import { onMount, untrack } from "svelte";
   import { fade, fly } from "svelte/transition";
   import {
     AlertTriangle,
     ArrowRight,
     Check,
     Copy,
-    LoaderCircle,
     Plus,
     RefreshCw,
     X,
@@ -15,7 +14,8 @@
     Calendar,
     Settings,
     BarChart3,
-    Eye
+    Eye,
+    LoaderCircle,
   } from "lucide-svelte";
   import {
     createHackathon,
@@ -23,7 +23,6 @@
     hackathonSettingsFromGlobal,
   } from "$lib/admin/api";
   import type {
-    AdminSnapshot,
     GlobalSettings,
     HackathonDraft,
     HackathonRecord,
@@ -31,28 +30,16 @@
   } from "$lib/admin/types";
   import {
     buildHackathonRoute,
-    emptySnapshot,
     isAuthRedirectRequiredError,
-    loadHostWorkspace,
   } from "$lib/admin/hostDashboard";
   import { formatDateTime } from "$lib/admin/analytics";
+  import { adminStore } from "$lib/admin/adminStore.svelte";
+  import Skeleton from "$lib/components/admin/Skeleton.svelte";
 
-  let currentUser = $state<HostAccount | null>(null);
-  let snapshot = $state<AdminSnapshot>(emptySnapshot);
-  let hackathons = $state<HackathonRecord[]>([]);
-  let hackathonSource = $state<"appwrite" | "local">("local");
-  let hackathonWarning = $state<string | null>(null);
   let newHackathon = $state<HackathonDraft>(defaultHackathonDraft());
-  let globalSettings = $state<GlobalSettings>(emptySnapshot.globalSettings);
-
-  let loading = $state(true);
-  let refreshing = $state(false);
   let creatingHackathon = $state(false);
-
-  let dashboardError = $state("");
   let actionError = $state("");
   let hasHydratedGlobalDefaults = false;
-
   let isDrawerOpen = $state(false);
   let copiedId = $state("");
 
@@ -60,6 +47,16 @@
   let startDateFilter = $state("");
   let endDateFilter = $state("");
   let statusFilter = $state("");
+
+  let currentUser = $derived(adminStore.currentUser);
+  let snapshot = $derived(adminStore.snapshot);
+  let hackathons = $derived(adminStore.hackathons);
+  let hackathonSource = $derived(adminStore.hackathonSource);
+  let hackathonWarning = $derived(adminStore.hackathonWarning);
+  let globalSettings = $derived(adminStore.globalSettings);
+  let loading = $derived(adminStore.loading);
+  let refreshing = $derived(adminStore.refreshing);
+  let dashboardError = $derived(adminStore.error);
 
   let filteredHackathons = $derived(
     hackathons.filter((h) => {
@@ -86,55 +83,26 @@
     );
   }
 
-  async function loadPage(options: { silent?: boolean } = {}) {
-    if (options.silent) {
-      refreshing = true;
-    } else {
-      loading = true;
+  // Hydrate defaults when global settings change
+  $effect(() => {
+    const currentGlobalDefaults = hackathonSettingsFromGlobal(globalSettings);
+    // Use untrack to read draft settings without subscribing — prevents infinite loop
+    const shouldHydrate = untrack(() => {
+      return !hasHydratedGlobalDefaults || sameHackathonSettings(newHackathon.settings, currentGlobalDefaults);
+    });
+    if (shouldHydrate) {
+      newHackathon.settings = { ...currentGlobalDefaults };
     }
+    hasHydratedGlobalDefaults = true;
+  });
 
-    dashboardError = "";
-
+  async function handleRefresh() {
     try {
-      const data = await loadHostWorkspace();
-      if (!data) {
-        await goto("/admin/signin", { replaceState: true });
-        return;
-      }
-
-      currentUser = data.currentUser;
-      hackathons = data.hackathons;
-      hackathonSource = data.hackathonSource;
-      hackathonWarning = data.hackathonWarning;
-
-      const previousGlobalDefaults = hackathonSettingsFromGlobal(globalSettings);
-      snapshot = data.snapshot;
-      globalSettings = data.snapshot.globalSettings;
-
-      const nextGlobalDefaults = hackathonSettingsFromGlobal(globalSettings);
-      if (
-        !hasHydratedGlobalDefaults ||
-        sameHackathonSettings(newHackathon.settings, previousGlobalDefaults)
-      ) {
-        newHackathon = {
-          ...newHackathon,
-          settings: nextGlobalDefaults,
-        };
-      }
-      hasHydratedGlobalDefaults = true;
+      await adminStore.forceRefresh();
     } catch (err) {
       if (isAuthRedirectRequiredError(err)) {
         await goto(err.target, { replaceState: true });
-        return;
       }
-
-      dashboardError =
-        err instanceof Error
-          ? err.message
-          : "Unable to load the host hackathons workspace right now.";
-    } finally {
-      loading = false;
-      refreshing = false;
     }
   }
 
@@ -149,16 +117,17 @@
     });
   }
 
-  onMount(() => {
-    void loadPage();
-
-    const intervalId = window.setInterval(() => {
-      void loadPage({ silent: true });
-    }, 20_000);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
+  onMount(async () => {
+    try {
+      await adminStore.ensure();
+      if (!adminStore.currentUser) {
+        await goto("/admin/signin", { replaceState: true });
+      }
+    } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+      }
+    }
   });
 
   async function handleCreateHackathon(event: SubmitEvent) {
@@ -172,11 +141,9 @@
 
     try {
       const created = await createHackathon(currentUser, newHackathon);
-      if (created.warning) {
-        hackathonWarning = created.warning;
-      }
       newHackathon = defaultHackathonDraft(globalSettings);
       isDrawerOpen = false;
+      adminStore.invalidate();
       await goto(buildHackathonRoute(created.record.hackathonId));
     } catch (err) {
       actionError =
@@ -196,20 +163,33 @@
 </svelte:head>
 
 {#if loading}
-  <section class="flex min-h-[72vh] items-center justify-center p-4 sm:p-6 lg:p-8">
-    <div class="p-8 text-center bg-transparent">
-      <LoaderCircle size={32} class="mx-auto animate-spin text-indigo-600 dark:text-indigo-400" />
-      <h1 class="mt-4 text-2xl font-bold text-zinc-900 dark:text-white">Loading hackathons</h1>
-      <p class="mt-3 max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-        We're pulling together your hosted events and their dedicated workspaces.
-      </p>
+  <section class="p-4 pb-20 sm:p-6 lg:p-8">
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <!-- Header skeleton -->
+      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 lg:border-r-0">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <Skeleton variant="text" width="200px" height="28px" />
+          <div class="flex gap-3">
+            <Skeleton variant="text" width="100px" height="40px" />
+            <Skeleton variant="text" width="120px" height="40px" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Search/filter skeleton -->
+      <div class="flex flex-col sm:flex-row gap-4 mb-2">
+        <Skeleton variant="text" width="100%" height="40px" />
+      </div>
+
+      <!-- Table skeleton -->
+      <Skeleton variant="table" rows={4} columns={5} />
     </div>
   </section>
 {:else}
   <section class="p-4 pb-20 sm:p-6 lg:p-8">
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
-      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800">
+      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 lg:border-r-0">
         <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
           <div class="max-w-3xl">
             <h1 class="text-2xl font-bold text-zinc-900 dark:text-white sm:text-3xl">
@@ -219,7 +199,7 @@
           <div class="flex flex-col gap-3 sm:flex-row">
             <button
               type="button"
-              onclick={() => loadPage({ silent: true })}
+              onclick={handleRefresh}
               class="inline-flex items-center justify-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
             >
               {#if refreshing}
@@ -339,9 +319,9 @@
           </button>
         </div>
       {:else}
-        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900/40 shadow-sm mt-4">
+        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/40 shadow-sm mt-4">
           <table class="w-full text-left text-sm text-zinc-600 dark:text-zinc-400 whitespace-nowrap lg:whitespace-normal">
-            <thead class="bg-zinc-50/80 border-b border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 dark:bg-zinc-900/60 dark:text-zinc-400">
+            <thead class="bg-zinc-50/80 border-b border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/60 dark:text-zinc-400">
               <tr>
                 <th scope="col" class="px-6 py-4">Hackathon</th>
                 <th scope="col" class="px-6 py-4">Status</th>
@@ -417,7 +397,7 @@
       {/if}
 
       {#if isDrawerOpen}
-        <div class="fixed inset-0 lg:left-60 z-50 flex items-end">
+        <div class="fixed inset-0 z-50 flex items-end lg:left-[var(--sidebar-width,260px)]">
           <!-- Backdrop -->
           <button 
             type="button" 
@@ -431,12 +411,12 @@
           <!-- Drawer panel -->
           <div 
             transition:fly={{ y: 800, duration: 300 }}
-            class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border-t border-zinc-200 dark:border-zinc-800 flex flex-col h-[90vh] sm:h-[calc(100vh-4rem)] rounded-t-2xl"
+            class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border border-zinc-200 dark:border-zinc-800 lg:border-r-0 border-b-0 flex flex-col h-[85vh] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-0.75rem)] rounded-t-2xl lg:rounded-tl-[24px] lg:rounded-tr-none"
           >
-             <div class="sticky top-0 z-20 flex w-full items-center justify-center bg-white pt-3 pb-1 dark:bg-zinc-900">
+             <div class="sticky top-0 z-20 flex w-full items-center justify-center bg-white pt-2 pb-1 dark:bg-zinc-900">
                <div class="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
              </div>
-             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10">
+             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 lg:border-r-0 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10">
                 <div>
                   <h2 class="text-lg font-bold text-zinc-900 dark:text-white">Create an event workspace</h2>
                   <p class="text-xs text-zinc-500 mt-1 dark:text-zinc-400">Start configuring a new hackathon.</p>
@@ -563,7 +543,7 @@
                 </form>
              </div>
              
-             <div class="border-t border-zinc-200 dark:border-zinc-800 p-5 bg-zinc-50 dark:bg-zinc-900/80 sticky bottom-0 z-10 flex gap-3">
+             <div class="border-t border-zinc-200 dark:border-zinc-800 lg:border-r-0 p-5 bg-zinc-50 dark:bg-zinc-900/80 sticky bottom-0 z-10 flex gap-3">
                 <button
                   type="button"
                   onclick={toggleDrawer}

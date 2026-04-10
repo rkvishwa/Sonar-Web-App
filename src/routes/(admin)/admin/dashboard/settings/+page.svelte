@@ -17,24 +17,31 @@
     changeCurrentPassword,
   } from "$lib/admin/auth";
   import type {
-    AdminSnapshot,
     GlobalSettings,
-    HostAccount,
   } from "$lib/admin/types";
   import {
-    emptySnapshot,
     isAuthRedirectRequiredError,
-    loadHostWorkspace,
-    platformAccessLabel,
   } from "$lib/admin/hostDashboard";
+  import { adminStore } from "$lib/admin/adminStore.svelte";
+  import Skeleton from "$lib/components/admin/Skeleton.svelte";
 
-  let currentUser = $state<HostAccount | null>(null);
-  let snapshot = $state<AdminSnapshot>(emptySnapshot);
-  let globalSettings = $state<GlobalSettings>(emptySnapshot.globalSettings);
-  let hostedHackathonCount = $state(0);
+  let localGlobalSettings = $state<GlobalSettings | null>(null);
 
-  let loading = $state(true);
-  let refreshing = $state(false);
+  let currentUser = $derived(adminStore.currentUser);
+  let snapshot = $derived(adminStore.snapshot);
+  let loading = $derived(adminStore.loading);
+  let refreshing = $derived(adminStore.refreshing);
+  let dashboardError = $derived(adminStore.error);
+  let hostedHackathonCount = $derived(adminStore.hackathons.length);
+
+  // Initialize local settings copy when store data arrives
+  $effect(() => {
+    const storeSettings = adminStore.globalSettings;
+    if (storeSettings && !localGlobalSettings) {
+      localGlobalSettings = { ...storeSettings };
+    }
+  });
+
   let savingGlobalSettings = $state(false);
   let updatingPassword = $state(false);
   let activeTab = $state<"global" | "account" | "appearance">("global");
@@ -122,49 +129,22 @@
     confirmPassword: "",
   });
 
-  let dashboardError = $state("");
   let actionError = $state("");
   let actionMessage = $state("");
 
-  async function loadPage(options: { silent?: boolean } = {}) {
-    if (options.silent) {
-      refreshing = true;
-    } else {
-      loading = true;
-    }
-
-    dashboardError = "";
-
+  async function handleRefresh() {
     try {
-      const data = await loadHostWorkspace();
-      if (!data) {
-        await goto("/admin/signin", { replaceState: true });
-        return;
-      }
-
-      currentUser = data.currentUser;
-      snapshot = data.snapshot;
-      globalSettings = { ...data.snapshot.globalSettings };
-      hostedHackathonCount = data.hackathons.length;
+      await adminStore.forceRefresh();
+      // Refresh local settings copy
+      localGlobalSettings = { ...adminStore.globalSettings };
     } catch (err) {
       if (isAuthRedirectRequiredError(err)) {
         await goto(err.target, { replaceState: true });
-        return;
       }
-
-      dashboardError =
-        err instanceof Error
-          ? err.message
-          : "Unable to load host settings right now.";
-    } finally {
-      loading = false;
-      refreshing = false;
     }
   }
 
-  onMount(() => {
-    void loadPage();
-    
+  onMount(async () => {
     // Init theme
     if (localStorage.theme === "light" || localStorage.theme === "dark") {
       currentTheme = localStorage.theme;
@@ -178,26 +158,30 @@
       currentAccent = savedAccent;
     }
 
-    const intervalId = window.setInterval(() => {
-      void loadPage({ silent: true });
-    }, 20_000);
-
-    return () => {
-      window.clearInterval(intervalId);
-    };
+    try {
+      await adminStore.ensure();
+      if (!adminStore.currentUser) {
+        await goto("/admin/signin", { replaceState: true });
+        return;
+      }
+      localGlobalSettings = { ...adminStore.globalSettings };
+    } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+      }
+    }
   });
 
   async function handleSaveGlobalSettings() {
+    if (!localGlobalSettings) return;
+
     savingGlobalSettings = true;
     actionError = "";
     actionMessage = "";
 
     try {
-      await updateGlobalSettings(globalSettings);
-      snapshot = {
-        ...snapshot,
-        globalSettings: { ...globalSettings },
-      };
+      await updateGlobalSettings(localGlobalSettings);
+      adminStore.invalidate();
       actionMessage = "Saved your global host settings.";
     } catch (err) {
       actionError =
@@ -251,13 +235,49 @@
 </svelte:head>
 
 {#if loading}
-  <section class="flex min-h-[72vh] items-center justify-center p-4 sm:p-6 lg:p-8">
-    <div class="p-8 text-center bg-transparent">
-      <LoaderCircle size={32} class="mx-auto animate-spin text-indigo-600 dark:text-indigo-400" />
-      <h1 class="mt-4 text-2xl font-bold text-zinc-900 dark:text-white">Loading settings</h1>
-      <p class="mt-3 max-w-xl text-sm leading-6 text-zinc-500 dark:text-zinc-400">
-        We're assembling your host defaults and account tools.
-      </p>
+  <section class="p-4 pb-20 sm:p-6 lg:p-8">
+    <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
+      <!-- Header skeleton -->
+      <div class="border-b border-zinc-200 pb-4 dark:border-zinc-800">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <Skeleton variant="text" width="140px" height="24px" />
+          <div class="flex gap-3">
+            <Skeleton variant="text" width="200px" height="38px" />
+            <Skeleton variant="text" width="100px" height="38px" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings body skeleton -->
+      <div class="mt-6 flex flex-col gap-8 md:flex-row lg:mt-8 lg:gap-10">
+        <!-- Sidebar skeleton -->
+        <aside class="w-full shrink-0 space-y-2 md:w-48">
+          {#each Array(3) as _}
+            <Skeleton variant="text" width="100%" height="36px" />
+          {/each}
+        </aside>
+
+        <!-- Content skeleton -->
+        <div class="min-w-0 flex-1 space-y-6">
+          <div class="flex items-center gap-3 mb-6">
+            <Skeleton variant="circle" width="32px" height="32px" />
+            <Skeleton variant="text" width="180px" height="18px" />
+          </div>
+          <Skeleton variant="text" width="100%" height="14px" />
+          <div class="space-y-px rounded-md border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+            {#each Array(2) as _}
+              <div class="flex items-center justify-between px-5 py-4 bg-white dark:bg-zinc-900">
+                <div class="flex flex-col gap-1.5 flex-1">
+                  <Skeleton variant="text" width="160px" height="14px" />
+                  <Skeleton variant="text" width="280px" height="11px" />
+                </div>
+                <Skeleton variant="text" width="44px" height="24px" />
+              </div>
+            {/each}
+          </div>
+          <Skeleton variant="text" width="130px" height="38px" />
+        </div>
+      </div>
     </div>
   </section>
 {:else}
@@ -284,7 +304,7 @@
             </div>
             <button
               type="button"
-              onclick={() => loadPage({ silent: true })}
+              onclick={handleRefresh}
               class="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-zinc-50 px-4 py-2 text-sm font-semibold text-zinc-700 shadow-sm transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700"
             >
               {#if refreshing}
@@ -390,62 +410,64 @@
                 </p>
               </div>
 
-              <div class="mb-6 overflow-hidden rounded-md border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-800">
-                <div class="flex flex-col space-y-px">
-                  <div class="flex items-center justify-between bg-white px-5 py-4 transition-colors hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800/80">
-                    <div class="flex-1 pr-4">
-                      <span class="block text-sm font-medium text-zinc-900 dark:text-zinc-100">Block internet access</span>
-                      <span class="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">Prevent network access inside isolated workspaces by default</span>
+              {#if localGlobalSettings}
+                <div class="mb-6 overflow-hidden rounded-md border border-zinc-200 bg-zinc-200 dark:border-zinc-800 dark:bg-zinc-800">
+                  <div class="flex flex-col space-y-px">
+                    <div class="flex items-center justify-between bg-white px-5 py-4 transition-colors hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800/80">
+                      <div class="flex-1 pr-4">
+                        <span class="block text-sm font-medium text-zinc-900 dark:text-zinc-100">Block internet access</span>
+                        <span class="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">Prevent network access inside isolated workspaces by default</span>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-label="Toggle default internet restriction"
+                        aria-checked={localGlobalSettings.blockInternetAccess}
+                        onclick={() => { if (localGlobalSettings) localGlobalSettings.blockInternetAccess = !localGlobalSettings.blockInternetAccess; }}
+                        class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${localGlobalSettings.blockInternetAccess ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${localGlobalSettings.blockInternetAccess ? 'translate-x-5' : 'translate-x-0'}`}
+                        ></span>
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-label="Toggle default internet restriction"
-                      aria-checked={globalSettings.blockInternetAccess}
-                      onclick={() => globalSettings.blockInternetAccess = !globalSettings.blockInternetAccess}
-                      class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${globalSettings.blockInternetAccess ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
-                    >
-                      <span
-                        aria-hidden="true"
-                        class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${globalSettings.blockInternetAccess ? 'translate-x-5' : 'translate-x-0'}`}
-                      ></span>
-                    </button>
-                  </div>
 
-                  <div class="flex items-center justify-between bg-white px-5 py-4 transition-colors hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800/80">
-                    <div class="flex-1 pr-4">
-                      <span class="block text-sm font-medium text-zinc-900 dark:text-zinc-100">Require empty workspaces</span>
-                      <span class="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">Ensure new environments start completely empty</span>
+                    <div class="flex items-center justify-between bg-white px-5 py-4 transition-colors hover:bg-zinc-50 dark:bg-zinc-900 dark:hover:bg-zinc-800/80">
+                      <div class="flex-1 pr-4">
+                        <span class="block text-sm font-medium text-zinc-900 dark:text-zinc-100">Require empty workspaces</span>
+                        <span class="mt-0.5 block text-xs text-zinc-500 dark:text-zinc-400">Ensure new environments start completely empty</span>
+                      </div>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-label="Toggle default empty workspace restriction"
+                        aria-checked={localGlobalSettings.blockNonEmptyWorkspace}
+                        onclick={() => { if (localGlobalSettings) localGlobalSettings.blockNonEmptyWorkspace = !localGlobalSettings.blockNonEmptyWorkspace; }}
+                        class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${localGlobalSettings.blockNonEmptyWorkspace ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${localGlobalSettings.blockNonEmptyWorkspace ? 'translate-x-5' : 'translate-x-0'}`}
+                        ></span>
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      role="switch"
-                      aria-label="Toggle default empty workspace restriction"
-                      aria-checked={globalSettings.blockNonEmptyWorkspace}
-                      onclick={() => globalSettings.blockNonEmptyWorkspace = !globalSettings.blockNonEmptyWorkspace}
-                      class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 ${globalSettings.blockNonEmptyWorkspace ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-700'}`}
-                    >
-                      <span
-                        aria-hidden="true"
-                        class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${globalSettings.blockNonEmptyWorkspace ? 'translate-x-5' : 'translate-x-0'}`}
-                      ></span>
-                    </button>
                   </div>
                 </div>
-              </div>
 
-              <button
-                type="button"
-                onclick={handleSaveGlobalSettings}
-                class="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-60"
-                disabled={savingGlobalSettings || !snapshot.capabilities.canManagePlatform}
-              >
-                {#if savingGlobalSettings}
-                  <LoaderCircle size={14} class="animate-spin" /> Saving Defaults...
-                {:else}
-                  <Save size={14} /> Save Defaults
-                {/if}
-              </button>
+                <button
+                  type="button"
+                  onclick={handleSaveGlobalSettings}
+                  class="inline-flex items-center justify-center gap-2 rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600 disabled:cursor-not-allowed disabled:opacity-60"
+                  disabled={savingGlobalSettings || !snapshot.capabilities.canManagePlatform}
+                >
+                  {#if savingGlobalSettings}
+                    <LoaderCircle size={14} class="animate-spin" /> Saving Defaults...
+                  {:else}
+                    <Save size={14} /> Save Defaults
+                  {/if}
+                </button>
+              {/if}
             </div>
           {/if}
 

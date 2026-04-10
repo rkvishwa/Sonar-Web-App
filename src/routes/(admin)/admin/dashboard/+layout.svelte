@@ -13,9 +13,19 @@
   } from "lucide-svelte";
   import { signOut } from "$lib/admin/auth";
   import { goto } from "$app/navigation";
+  import { onMount } from "svelte";
   import ThemeToggle from "$lib/components/ThemeToggle.svelte";
+  import ErrorBoundary from "$lib/components/admin/ErrorBoundary.svelte";
+  import { adminStore } from "$lib/admin/adminStore.svelte";
 
   let { children } = $props();
+
+  onMount(() => {
+    adminStore.startPolling();
+    return () => {
+      adminStore.stopPolling();
+    };
+  });
 
   let isMobileSidebarOpen = $state(false);
   let isSidebarCollapsed = $state(false);
@@ -53,7 +63,7 @@
   }
 </script>
 
-<div class="flex h-screen w-full overflow-hidden font-sans text-zinc-900 dark:text-zinc-100 bg-[#fbfbfb] dark:bg-[#09090b]">
+<div class="flex h-screen w-full overflow-hidden font-sans text-zinc-900 dark:text-zinc-100 bg-[#fbfbfb] dark:bg-[#09090b]" style="--sidebar-width: {isSidebarCollapsed ? '88px' : '260px'};">
 
   <!-- Mobile Header -->
   <div class="flex h-[60px] items-center justify-between border-b border-zinc-200 bg-white px-5 dark:border-zinc-800 dark:bg-zinc-900 lg:hidden shrink-0 w-full fixed top-0 z-40 shadow-sm">
@@ -159,8 +169,10 @@
   {/if}
 
   <!-- Main Content Area -->
-  <main class="flex flex-1 flex-col overflow-y-auto z-10 pt-[60px] lg:pt-0 custom-scrollbar bg-white dark:bg-zinc-900 lg:my-3 lg:mr-3 lg:rounded-[32px] shadow-[0_2px_20px_-8px_rgba(0,0,0,0.05)] border border-zinc-200 dark:border-zinc-800">
-    {@render children()}
+  <main class="flex flex-1 flex-col overflow-y-auto z-10 pt-[60px] lg:pt-0 custom-scrollbar bg-white dark:bg-zinc-900 lg:my-3 lg:rounded-l-[32px] shadow-[0_2px_20px_-8px_rgba(0,0,0,0.05)] border border-zinc-200 lg:border-r-0 dark:border-zinc-800">
+    <ErrorBoundary>
+      {@render children()}
+    </ErrorBoundary>
   </main>
 </div>
 

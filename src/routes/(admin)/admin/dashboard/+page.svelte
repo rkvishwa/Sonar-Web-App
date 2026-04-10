@@ -1,5 +1,6 @@
 <script lang="ts">
   import Chart from "$lib/components/admin/Chart.svelte";
+  import Skeleton from "$lib/components/admin/Skeleton.svelte";
   import { goto } from "$app/navigation";
   import { onMount } from "svelte";
   import {
@@ -10,37 +11,18 @@
     RefreshCw,
     ShieldAlert,
     Users,
-    LoaderCircle,
   } from "lucide-svelte";
-  import { loadAdminSnapshot } from "$lib/admin/api";
-  import { refreshSession, resolveAuthenticatedRoute } from "$lib/admin/auth";
-  import type { AdminSnapshot, HostAccount } from "$lib/admin/types";
+  import { adminStore } from "$lib/admin/adminStore.svelte";
+  import { isAuthRedirectRequiredError } from "$lib/admin/hostDashboard";
+  import { resolveAuthenticatedRoute } from "$lib/admin/auth";
+  import type { AdminSnapshot } from "$lib/admin/types";
 
-  let currentUser = $state<HostAccount | null>(null);
-  let snapshot = $state<AdminSnapshot>({
-    monitors: [],
-    reports: [],
-    settings: {
-      blockInternetAccess: false,
-      blockNonEmptyWorkspace: false,
-    },
-    globalSettings: {
-      blockInternetAccess: false,
-      blockNonEmptyWorkspace: false,
-    },
-    warnings: [],
-    capabilities: {
-      canReadTelemetry: false,
-      canReadReports: false,
-      canManagePlatform: false,
-      isUsingFunctionFallback: false,
-    },
-  });
-
-  let loading = $state(true);
-  let refreshing = $state(false);
   let lastRefreshedAt = $state<Date | null>(null);
-  let dashboardError = $state("");
+
+  let snapshot = $derived(adminStore.snapshot);
+  let loading = $derived(adminStore.loading);
+  let refreshing = $derived(adminStore.refreshing);
+  let dashboardError = $derived(adminStore.error);
 
   function getRiskStats() {
     const teams = snapshot.monitors;
@@ -87,39 +69,30 @@
     }]
   });
 
-  async function loadDashboard(options: { silent?: boolean } = {}) {
-    if (options.silent) {
-      refreshing = true;
-    } else {
-      loading = true;
-    }
-    dashboardError = "";
-
+  async function handleRefresh() {
     try {
-      const session = await refreshSession();
-      if (!session.user || !session.user.registrationCompleted) {
-        await goto(resolveAuthenticatedRoute(session.user), { replaceState: true });
-        return;
-      }
-      currentUser = session.user;
-      snapshot = await loadAdminSnapshot();
-    } catch (err) {
-      dashboardError = err instanceof Error ? err.message : "Unable to load dashboard data.";
-    } finally {
-      loading = false;
-      refreshing = false;
+      await adminStore.forceRefresh();
       lastRefreshedAt = new Date();
+    } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+      }
     }
   }
 
-  onMount(() => {
-    void loadDashboard();
-    const intervalId = window.setInterval(() => {
-      void loadDashboard({ silent: true });
-    }, 20_000);
-    return () => {
-      window.clearInterval(intervalId);
-    };
+  onMount(async () => {
+    try {
+      await adminStore.ensure();
+      if (adminStore.currentUser && !adminStore.currentUser.registrationCompleted) {
+        await goto(resolveAuthenticatedRoute(adminStore.currentUser), { replaceState: true });
+        return;
+      }
+      lastRefreshedAt = new Date();
+    } catch (err) {
+      if (isAuthRedirectRequiredError(err)) {
+        await goto(err.target, { replaceState: true });
+      }
+    }
   });
 </script>
 
@@ -128,10 +101,33 @@
 </svelte:head>
 
 {#if loading}
-  <section class="flex min-h-[50vh] items-center justify-center p-4 sm:p-6 lg:p-8">
-    <div class="flex flex-col items-center gap-4 text-center">
-      <LoaderCircle size={28} class="animate-spin text-indigo-600 dark:text-indigo-400" />
-      <p class="text-sm font-medium text-zinc-500 dark:text-zinc-400">Loading overview...</p>
+  <section class="max-w-6xl mx-auto w-full flex flex-col gap-6 p-4 pb-20 sm:p-6 lg:p-8">
+    <!-- Header skeleton -->
+    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-col gap-2">
+        <Skeleton variant="text" width="140px" height="24px" />
+        <Skeleton variant="text" width="280px" height="14px" />
+      </div>
+      <Skeleton variant="text" width="100px" height="38px" />
+    </div>
+
+    <!-- Stat cards skeleton -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-4">
+      {#each Array(3) as _}
+        <div class="flex flex-col gap-3">
+          <div class="flex items-center gap-2 mb-3">
+            <Skeleton variant="circle" width="16px" height="16px" />
+            <Skeleton variant="text" width="80px" height="12px" />
+          </div>
+          <Skeleton variant="text" width="60px" height="36px" />
+        </div>
+      {/each}
+    </div>
+
+    <!-- Charts skeleton -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-4">
+      <Skeleton variant="chart" />
+      <Skeleton variant="chart" />
     </div>
   </section>
 {:else}
@@ -151,7 +147,7 @@
         {/if}
         <button
           type="button"
-          onclick={() => loadDashboard({ silent: true })}
+          onclick={handleRefresh}
           disabled={refreshing}
           class="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
         >
