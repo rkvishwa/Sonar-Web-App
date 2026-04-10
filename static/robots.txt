@@ -1,5 +1,14 @@
-# allow crawling everything by default
+# Block all admin routes except signin and signup
 User-agent: *
-Disallow:
+Disallow: /admin/
+Allow: /admin/signin
+Allow: /admin/signup
+Allow: /admin/forgot-password
+
+# Block specific auth pages explicitly just in case
+Disallow: /admin/complete-registration
+Disallow: /admin/reset-password
+Disallow: /admin/verify-email
+Disallow: /admin/auth/
 
 Sitemap: https://sonar.knurdz.org/sitemap.xml

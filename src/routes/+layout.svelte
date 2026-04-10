@@ -36,18 +36,45 @@
       page.url.pathname === "/admin/forgot-password" ||
       page.url.pathname === "/admin/reset-password"
   );
+
+  let noIndexPage = $derived(
+    page.url.pathname.startsWith("/admin") &&
+      page.url.pathname !== "/admin/signin" &&
+      page.url.pathname !== "/admin/signup"
+  );
 </script>
 
 <svelte:head>
+  <!-- SEO & Rich Data -->
+  <title>Sonar Code Editor | Advanced Ide by Knurdz</title>
+  <meta name="description" content="Sonar Code Editor by Knurdz: The ultimate IDE for supervised coding, technical interviews, and collaborative programming." />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Sonar Code Editor | by Knurdz" />
+  <meta property="og:description" content="Explore Sonar, an advanced supervised coding editor designed by Knurdz. Perfect for technical interviews, real-time collaboration, and learning." />
+  <meta property="og:image" content="https://sonar.knurdz.org/social/banner.png" />
+  <meta property="og:site_name" content="Sonar IDE" />
+  <meta property="og:locale" content="en_US" />
+  
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Sonar Code Editor | by Knurdz" />
+  <meta name="twitter:description" content="Explore Sonar, an advanced supervised coding editor designed by Knurdz. Perfect for technical interviews, real-time collaboration, and learning." />
+  <meta name="twitter:image" content="https://sonar.knurdz.org/social/banner.png" />
+  <meta name="twitter:site" content="@knurdz" />
+  <meta name="twitter:creator" content="@knurdz" />
+
+  {#if noIndexPage}
+    <meta name="robots" content="noindex, nofollow" />
+  {:else}
+    <meta name="robots" content="index, follow" />
+  {/if}
+
   <meta name="theme-color" content="#071018" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#f7fbff" media="(prefers-color-scheme: light)" />
   <meta name="author" content="Knurdz" />
-  <meta name="keywords" content="Sonar IDE, Supervised Coding, Monitored Exams, Collaborative Code Editor, Technical Interviews, IDE, Monaco Editor, Education, Knurdz" />
-  
-  <meta property="og:site_name" content="Sonar IDE" />
-  <meta property="og:locale" content="en_US" />
-  <meta name="twitter:site" content="@knurdz" />
-  <meta name="twitter:creator" content="@knurdz" />
+  <meta name="keywords" content="Sonar IDE, Sonar Code Editor, Supervised Coding, Monitored Exams, Collaborative Code Editor, Technical Interviews, IDE, Monaco Editor, Education, Knurdz" />
 </svelte:head>
 
 <div
