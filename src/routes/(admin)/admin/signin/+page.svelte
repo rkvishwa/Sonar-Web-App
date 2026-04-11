@@ -22,6 +22,11 @@
   let showPassword = $state(false);
 
   onMount(async () => {
+    document.body.classList.remove("overflow-hidden");
+    document.documentElement.classList.remove("overflow-hidden");
+    document.body.style.removeProperty("overflow");
+    document.documentElement.style.removeProperty("overflow");
+
     const session = await refreshSession();
     if (session.user) {
       await goto(resolveAuthenticatedRoute(session.user), { replaceState: true });

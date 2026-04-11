@@ -596,6 +596,14 @@ export async function completeOAuthRegistration(
 }
 
 export async function signOut() {
+  if (browser) {
+    // Defensive cleanup for UI states that may lock page scrolling (e.g. mobile drawers).
+    document.body.classList.remove("overflow-hidden");
+    document.documentElement.classList.remove("overflow-hidden");
+    document.body.style.removeProperty("overflow");
+    document.documentElement.style.removeProperty("overflow");
+  }
+
   if (!account) {
     setState({
       status: "ready",

@@ -16,11 +16,11 @@
 
 <Toast />
 
-<div class="auth-page flex-1 flex flex-col">
+<div class="auth-page flex-1 flex flex-col overflow-y-auto min-h-[100dvh]">
   <!-- Main content -->
-  <div class="auth-content w-full max-w-7xl mx-auto flex-1 flex flex-col items-center justify-center px-4 py-12 sm:py-20">
+  <div class="auth-content w-full max-w-7xl mx-auto flex-1 flex flex-col items-center px-4 py-12 sm:py-20">
     <!-- Form panel (centered) -->
-    <div class="auth-form-panel w-full max-w-[440px] rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-slate-950 sm:p-10">
+    <div class="auth-form-panel w-full max-w-[440px] rounded-xl border border-slate-200 bg-white p-8 shadow-sm dark:border-white/10 dark:bg-slate-950 sm:p-10 my-auto shrink-0">
       {@render children()}
 
       <p class="mt-6 text-sm text-slate-500 dark:text-slate-400">

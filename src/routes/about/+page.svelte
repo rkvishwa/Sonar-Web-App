@@ -4,20 +4,47 @@
 
   interface Contributor {
     login: string;
+    name?: string;
     avatar_url: string;
     html_url: string;
     contributions: number;
-    id: number;
+    id: number | string;
   }
 
-  let contributors = $state<Contributor[]>([]);
+  const manualContributors: Contributor[] = [
+    {
+      id: 'manual-thesaru-praneeth',
+      login: 'Thesaru-p',
+      name: 'Thesaru-Praneeth',
+      avatar_url: '/user/thesaru.png',
+      html_url: 'https://github.com/Thesaru-p',
+      contributions: 46
+    }
+  ];
+
+  function sortContributors(list: Contributor[]) {
+    return [...list].sort(
+      (a, b) => b.contributions - a.contributions || (a.name ?? a.login).localeCompare(b.name ?? b.login)
+    );
+  }
+
+  function mergeContributors(remoteContributors: Contributor[]) {
+    const manualLogins = new Set(manualContributors.map((contributor) => contributor.login));
+    const uniqueRemoteContributors = remoteContributors.filter(
+      (contributor) => !manualLogins.has(contributor.login)
+    );
+
+    return sortContributors([...uniqueRemoteContributors, ...manualContributors]);
+  }
+
+  let contributors = $state<Contributor[]>(sortContributors(manualContributors));
   let loading = $state(true);
 
   onMount(async () => {
     try {
       const res = await fetch('https://api.github.com/repos/rkvishwa/Sonar-Code-Editor/contributors');
       if (res.ok) {
-        contributors = await res.json();
+        contributors = mergeContributors(await res.json());
       }
     } catch (err) {
       console.error('Failed to load contributors', err);
@@ -96,10 +123,16 @@
             class="flex flex-col items-center group p-4 rounded-2xl hover:bg-zinc-50 dark:hover:bg-white/5 transition"
           >
             <div class="w-20 h-20 rounded-full overflow-hidden mb-4 ring-2 ring-zinc-200 dark:ring-white/10 group-hover:ring-blue-500 transition-all">
-              <img src={contributor.avatar_url} alt={contributor.login} class="w-full h-full object-cover" />
+              <img
+                src={contributor.avatar_url}
+                alt={contributor.name ?? contributor.login}
+                class="w-full h-full object-cover"
+              />
             </div>
-            <span class="font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">{contributor.login}</span>
-            <span class="text-xs text-zinc-500 dark:text-zinc-500 mt-1">{contributor.contributions} commits</span>
+            <span class="text-center font-medium text-zinc-700 dark:text-zinc-300 group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
+              {contributor.name ?? contributor.login}
+            </span>
+            <span class="text-center text-xs text-zinc-500 dark:text-zinc-500 mt-1">{contributor.contributions} commits</span>
           </a>
         {/each}
       </div>

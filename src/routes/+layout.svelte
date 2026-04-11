@@ -266,11 +266,9 @@
   {/if}
 
   <main class={`relative z-10 flex-1 flex flex-col ${showMainLayout ? "pt-12" : ""}`}>
-    {#key page.url.pathname}
-      <div class="page-load-smooth">
-        {@render children()}
-      </div>
-    {/key}
+    <div class="page-load-smooth flex-1 flex flex-col w-full">
+      {@render children()}
+    </div>
   </main>
 
   {#if showMainLayout}

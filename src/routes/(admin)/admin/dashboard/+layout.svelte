@@ -22,23 +22,22 @@
 
   let contentScrollContainer: HTMLElement | null = null;
 
+  afterNavigate((navigation) => {
+    if (!contentScrollContainer || !navigation.to?.url) {
+      return;
+    }
+
+    contentScrollContainer.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "auto"
+    });
+  });
+
   onMount(() => {
     adminStore.startPolling();
 
-    const removeAfterNavigate = afterNavigate((navigation) => {
-      if (!contentScrollContainer || !navigation.to?.url) {
-        return;
-      }
-
-      contentScrollContainer.scrollTo({
-        top: 0,
-        left: 0,
-        behavior: "auto"
-      });
-    });
-
     return () => {
-      removeAfterNavigate();
       adminStore.stopPolling();
     };
   });
