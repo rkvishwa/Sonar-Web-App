@@ -19,6 +19,7 @@
     Sparkles,
     Settings,
   } from "lucide-svelte";
+  import type { PageData } from "./$types";
   import { onMount, onDestroy } from "svelte";
 
   type ClientOS = "windows" | "mac" | "linux" | "other";
@@ -32,6 +33,7 @@
   let clientOS = $state<ClientOS>("other");
   let linkCopied = $state(false);
   let sectionRef: HTMLElement;
+  let { data }: { data: PageData } = $props();
   const macDownloadLink =
     "brew install --cask rkvishwa/knurdz/sonar-code-editor";
 
@@ -131,7 +133,7 @@
         <h1
           class="text-[clamp(3rem,6vw,5rem)] font-bold tracking-tight leading-[1.1] text-zinc-900 dark:text-white mb-5 hero-stagger-3"
         >
-          The IDE built for<br />
+          The open-source IDE built for<br />
           <span class="relative inline-flex items-end whitespace-nowrap">
             <span
               class="relative text-transparent bg-clip-text bg-linear-to-r from-cyan-700 via-sky-600 to-blue-700 dark:from-cyan-200 dark:via-sky-300 dark:to-blue-300 animate-gradient bg-size-[220%_auto]"
@@ -780,19 +782,19 @@
         <div
           class="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
         >
-          MIT
+          Jack
         </div>
-        <div class="text-sm text-zinc-500 dark:text-zinc-400">Open source</div>
+        <div class="text-sm text-zinc-500 dark:text-zinc-400">
+          File tree and editor tab
+        </div>
       </div>
       <div>
         <div
           class="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
         >
-          &lt;50ms
+          MIT
         </div>
-        <div class="text-sm text-zinc-500 dark:text-zinc-400">
-          Collab latency
-        </div>
+        <div class="text-sm text-zinc-500 dark:text-zinc-400">Open source</div>
       </div>
     </div>
   </div>
@@ -850,11 +852,11 @@
           <Users size={20} strokeWidth={1.8} />
         </div>
         <h3 class="text-base font-semibold mb-2 text-zinc-900 dark:text-white">
-          Yjs Collaboration
+          Yjs Collaboration & Jack
         </h3>
         <p class="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">
-          Google Docs-style live editing with shared cursors and conflict-free
-          data types.
+          Google Docs-style live editing with shared cursors, conflict-free
+          data types, and Jack for file tree and editor tabs.
         </p>
       </div>
 
@@ -945,83 +947,90 @@
   class="py-24 sm:py-32 relative bg-zinc-50/50 dark:bg-zinc-900/20 border-y border-zinc-100 dark:border-white/5"
 >
   <div class="container mx-auto px-6 max-w-4xl">
-    <div class="flex items-center justify-between mb-12">
-      <div>
-        <h2
-          class="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight mb-2"
-        >
-          Latest Updates
-        </h2>
-        <p class="text-sm text-zinc-500 dark:text-zinc-400">
-          We're constantly improving Sonar IDE.
-        </p>
-      </div>
-      <a
-        href="https://github.com/rkvishwa/Sonar-Code-Editor/releases"
-        target="_blank"
-        rel="noreferrer"
-        class="text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
+    <div class="mb-12">
+      <h2
+        class="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white tracking-tight mb-2"
       >
-        View all releases <ArrowRight size={14} />
-      </a>
+        Latest Updates
+      </h2>
+      <p class="text-sm text-zinc-500 dark:text-zinc-400">
+        We're constantly improving Sonar IDE.
+      </p>
     </div>
 
-    <div class="space-y-6">
-      <!-- Release Item -->
-      <div class="group relative pl-8 sm:pl-0">
-        <div
-          class="hidden sm:flex absolute left-0 top-0 bottom-0 w-32 flex-col items-end pr-8 pt-1"
-        >
-          <span
-            class="text-sm border border-cyan-500/20 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-2 py-0.5 rounded-md font-mono font-medium"
-            >v1.2.0</span
-          >
-          <span class="text-xs text-zinc-500 dark:text-zinc-400 mt-2"
-            >March 2026</span
-          >
+    <div class="relative max-w-5xl mx-auto">
+      <div class="relative bg-white dark:bg-[#0a0a0c] rounded-xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] border border-zinc-200/50 dark:border-white/10 w-full group transition-all duration-500">
+        <!-- Window header -->
+        <div class="flex items-center px-4 h-12 bg-zinc-50/80 dark:bg-[#121214]/80 border-b border-zinc-100 dark:border-white/5 backdrop-blur-md relative z-10 w-full">
+          <div class="flex gap-2">
+            <div class="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-700/80"></div>
+            <div class="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-700/80"></div>
+            <div class="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-700/80"></div>
+          </div>
+          <div class="mx-auto flex items-center gap-2 text-xs font-mono text-zinc-500 uppercase tracking-widest">
+            <Terminal size={14} class="opacity-70" /> CHANGELOG.md
+          </div>
+          <div class="w-12"></div>
         </div>
-        <div
-          class="sm:ml-32 relative bg-white dark:bg-white/3 rounded-2xl p-6 border border-zinc-100 dark:border-white/6 shadow-sm hover:shadow-md hover:border-zinc-200 dark:hover:border-white/10 transition-all duration-300"
-        >
-          <!-- Mobile Date/Version -->
-          <div class="sm:hidden flex items-center gap-3 mb-4">
-            <span
-              class="text-sm border border-cyan-500/20 bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 px-2 py-0.5 rounded-md font-mono font-medium"
-              >v1.2.0</span
-            >
-            <span class="text-xs text-zinc-500 dark:text-zinc-400"
-              >March 2026</span
-            >
+        
+        <!-- Window content -->
+        <div class="p-6 sm:p-10 font-mono text-sm relative z-10 w-full">
+          <div class="flex flex-col sm:flex-row justify-between items-start gap-8 mb-8 pb-8 border-b border-zinc-100 dark:border-white/5 w-full">
+            <div>
+              <h3 class="text-3xl sm:text-4xl font-bold tracking-tight mb-4 flex items-center gap-4 flex-wrap whitespace-normal text-zinc-900 dark:text-white font-sans">
+                {data.latestRelease.version}
+                <span class="px-2.5 py-1 text-[11px] font-sans font-bold uppercase tracking-widest text-cyan-700 dark:text-cyan-300 bg-cyan-50 dark:bg-cyan-500/10 rounded-md border border-cyan-200/50 dark:border-cyan-500/30">
+                  Latest Build
+                </span>
+              </h3>
+              <p class="text-zinc-500 dark:text-zinc-400 font-sans flex items-center gap-2 text-sm sm:text-base">
+                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                Deployed on <span class="text-zinc-700 dark:text-zinc-300 font-medium">{data.latestRelease.date}</span>
+              </p>
+            </div>
+            
+            <a href="https://github.com/rkvishwa/Sonar-Code-Editor/releases/tag/{data.latestRelease.version}" 
+               target="_blank" rel="noreferrer" 
+               class="flex items-center gap-2 px-5 py-2.5 bg-zinc-50 dark:bg-white/5 hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 text-sm hover:text-zinc-900 dark:hover:text-white rounded-xl border border-zinc-200 dark:border-white/10 hover:border-zinc-300 dark:hover:border-white/20 transition-all font-sans font-medium whitespace-nowrap">
+               <Terminal size={16} /> View Raw Logs
+               <ArrowRight size={16} />
+            </a>
           </div>
 
-          <h3 class="text-lg font-semibold text-zinc-900 dark:text-white mb-3">
-            Performance & Security Polish
-          </h3>
-          <ul class="space-y-2">
-            <li
-              class="flex items-start text-sm text-zinc-600 dark:text-zinc-300"
-            >
-              <Check size={16} class="text-emerald-500 mr-2 shrink-0 mt-0.5" />
-              <span
-                >Optimized Yjs CRDT engine to support larger collaborative
-                documents.</span
-              >
-            </li>
-            <li
-              class="flex items-start text-sm text-zinc-600 dark:text-zinc-300"
-            >
-              <Check size={16} class="text-emerald-500 mr-2 shrink-0 mt-0.5" />
-              <span
-                >Enhanced local-only secured preview environment stability.</span
-              >
-            </li>
-            <li
-              class="flex items-start text-sm text-zinc-600 dark:text-zinc-300"
-            >
-              <Check size={16} class="text-emerald-500 mr-2 shrink-0 mt-0.5" />
-              <span>Dark mode theme refinements and a11y improvements.</span>
-            </li>
-          </ul>
+          <!-- Code formatting for changes -->
+          <div class="space-y-4 bg-zinc-50 dark:bg-black/40 p-5 sm:p-6 rounded-xl border border-zinc-100 dark:border-white/5 shadow-inner select-text w-full">
+            <div class="text-zinc-500 dark:text-zinc-400 mb-5 flex items-center gap-2 text-[13px] sm:text-sm">
+              <span class="text-pink-600 dark:text-pink-400">export const</span> <span class="text-blue-600 dark:text-blue-300">releaseUpdates</span> <span class="text-zinc-400 dark:text-zinc-500">=</span> [
+            </div>
+            
+            <ul class="pl-3 sm:pl-6 space-y-4 relative w-full">
+              <!-- Timeline vertical line -->
+              <div class="absolute left-0 sm:left-1.5 top-2 bottom-2 w-px bg-zinc-200 dark:bg-white/10"></div>
+              
+              {#each data.latestRelease.changes as change}
+                <li class="relative group/line w-full pl-6">
+                  <span class="absolute left-0 sm:left-[-18px] top-2.5 w-3 h-px bg-zinc-300 dark:bg-white/20"></span>
+                  <div class="flex items-start text-zinc-700 dark:text-zinc-300 transition-colors w-full">
+                    <span class="text-emerald-600 dark:text-emerald-400 mr-2 mt-0.5 opacity-80 select-none">"</span>
+                    <span class="leading-relaxed text-[13px] sm:text-[14px] flex-1">{change}</span>
+                    <span class="text-emerald-600 dark:text-emerald-400 ml-1 mt-0.5 opacity-80 select-none">",</span>
+                  </div>
+                </li>
+              {/each}
+              {#if data.latestRelease.changes.length === 0}
+                <li class="relative group/line w-full pl-6">
+                  <span class="absolute left-0 sm:left-[-18px] top-2.5 w-3 h-px bg-zinc-300 dark:bg-white/20"></span>
+                  <div class="text-zinc-500 italic flex items-start text-[13px] sm:text-[14px]">
+                    <span class="text-emerald-600 dark:text-emerald-400/50 mr-2 select-none">"</span>
+                    <span class="flex-1">Minor system optimizations and security patches</span>
+                    <span class="text-emerald-600 dark:text-emerald-400/50 ml-1 select-none">",</span>
+                  </div>
+                </li>
+              {/if}
+            </ul>
+            
+            <div class="text-zinc-500 dark:text-zinc-400 mt-5 text-[13px] sm:text-sm select-none">];</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1058,13 +1067,11 @@
         Download Now
       </a>
       <a
-        href="https://github.com/rkvishwa/Sonar-Code-Editor/stargazers"
-        target="_blank"
-        rel="noreferrer"
+        href="/admin/signup"
         class="w-full sm:w-auto px-6 py-2.5 bg-white/70 dark:bg-white/6 hover:bg-white dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 font-medium rounded-lg flex items-center justify-center gap-2 border border-zinc-200/80 dark:border-white/8 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0 hover:shadow-sm"
       >
-        Star on GitHub
-        <ArrowRight size={14} class="opacity-50" />
+        <Users size={14} class="opacity-70" />
+        Sign Up (For Hosts)
       </a>
     </div>
   </div>
