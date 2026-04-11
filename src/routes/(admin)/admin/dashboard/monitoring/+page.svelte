@@ -142,15 +142,15 @@
   <section class="p-4 pb-20 sm:p-6 lg:p-8">
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
       <!-- Header skeleton -->
-      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 lg:border-r-0">
-        <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 xl:border-r-0">
+        <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <Skeleton variant="text" width="200px" height="28px" />
           <Skeleton variant="text" width="100px" height="40px" />
         </div>
       </div>
 
       <!-- Stats skeleton -->
-      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6 border-b border-zinc-200 pb-8 dark:border-zinc-800 lg:border-r-0">
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6 border-b border-zinc-200 pb-8 dark:border-zinc-800 xl:border-r-0">
         {#each Array(4) as _}
           <Skeleton variant="card" />
         {/each}
@@ -171,8 +171,8 @@
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
       <!-- Page Header -->
-      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 lg:border-r-0">
-        <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 xl:border-r-0">
+        <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div class="max-w-3xl">
             <h1 class="text-2xl font-bold text-zinc-900 dark:text-white sm:text-3xl">
               Monitoring
@@ -218,8 +218,8 @@
       {/if}
 
       <!-- Stats -->
-      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6 border-b border-zinc-200 pb-8 dark:border-zinc-800 lg:border-r-0">
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/50">
+      <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4 mb-6 border-b border-zinc-200 pb-8 dark:border-zinc-800 xl:border-r-0">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Visible Teams</p>
@@ -231,7 +231,7 @@
           </div>
         </div>
 
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/50">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Online Now</p>
@@ -243,7 +243,7 @@
           </div>
         </div>
 
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/50">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Flagged Teams</p>
@@ -257,7 +257,7 @@
           </div>
         </div>
 
-        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/50">
+        <div class="rounded-xl border border-zinc-200 bg-white p-5 shadow-sm dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50">
           <div class="flex items-center justify-between">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">Reports</p>
@@ -274,7 +274,7 @@
       <div class="grid gap-6 xl:grid-cols-1">
         <!-- Team Table -->
         <div class="py-4">
-          <div class="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between mb-5">
+          <div class="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-5">
             <div>
               <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Team Monitoring</p>
               <h2 class="mt-1.5 text-lg font-bold text-zinc-900 dark:text-white">Current editor sessions</h2>
@@ -308,9 +308,9 @@
             </div>
           </div>
 
-          <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white/50 dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/50 shadow-sm">
+          <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white/50 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50 shadow-sm">
             <table class="min-w-full text-left">
-              <thead class="bg-zinc-50/80 border-b border-zinc-200 dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/80 tracking-wider font-semibold text-xs text-zinc-500 uppercase">
+              <thead class="bg-zinc-50/80 border-b border-zinc-200 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/80 tracking-wider font-semibold text-xs text-zinc-500 uppercase">
                 <tr>
                   <th class="px-6 py-4">Team</th>
                   <th class="px-6 py-4">Status</th>
@@ -365,7 +365,7 @@
       </div>
 
       <!-- Reports -->
-      <div class="border-t border-zinc-200 pt-8 mt-2 dark:border-zinc-800 lg:border-r-0">
+      <div class="border-t border-zinc-200 pt-8 mt-2 dark:border-zinc-800 xl:border-r-0">
         <div class="flex items-center justify-between mb-5">
           <div>
             <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Saved Reports</p>
@@ -373,9 +373,9 @@
           </div>
         </div>
 
-        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white/40 shadow-sm dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/30">
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white/40 shadow-sm dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/30">
           <table class="min-w-full text-left text-sm">
-            <thead class="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/50 text-zinc-400 uppercase tracking-wider text-[10px] font-bold">
+            <thead class="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50 text-zinc-400 uppercase tracking-wider text-[10px] font-bold">
               <tr>
                 <th class="px-5 py-3">Team & Event</th>
                 <th class="px-5 py-3">Generated</th>
@@ -419,7 +419,7 @@
 
       <!-- Team Detail Drawer -->
       {#if isDrawerOpen}
-        <div class="fixed inset-0 z-50 flex items-end lg:left-[var(--sidebar-width,260px)]">
+        <div class="fixed inset-0 z-50 flex items-end xl:left-[var(--sidebar-width,260px)]">
           <button 
             type="button"
             aria-label="Close drawer"
@@ -431,12 +431,12 @@
           
           <div 
             transition:fly={{ y: 800, duration: 300 }}
-            class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border border-zinc-200 dark:border-zinc-800 lg:border-r-0 border-b-0 flex flex-col h-[85vh] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-0.75rem)] rounded-t-2xl lg:rounded-tl-[24px] lg:rounded-tr-none"
+            class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border border-zinc-200 dark:border-zinc-800 xl:border-r-0 border-b-0 flex flex-col h-[85vh] sm:h-[calc(100vh-4rem)] xl:h-[calc(100vh-0.75rem)] rounded-t-2xl xl:rounded-tl-[24px] xl:rounded-tr-none"
           >
              <div class="sticky top-0 z-20 flex w-full items-center justify-center bg-white pt-2 pb-1 dark:bg-zinc-900">
                <div class="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
              </div>
-             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 lg:border-r-0 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10 hidden sm:flex">
+             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 xl:border-r-0 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10 hidden sm:flex">
                 <div class="flex flex-col gap-1">
                   <h2 class="text-lg font-bold text-zinc-900 dark:text-white">Team detail view</h2>
                   <p class="text-xs font-semibold uppercase tracking-widest text-indigo-600 dark:text-indigo-400">Analytics</p>
@@ -469,7 +469,7 @@
                    </div>
 
                    <div class="grid grid-cols-2 gap-4 mt-6">
-                     <div class="col-span-2 rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-800/20 flex flex-col items-center justify-center">
+                     <div class="col-span-2 rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-800/20 flex flex-col items-center justify-center">
                        <p class="text-[10px] font-semibold uppercase w-full tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Time Allocation</p>
                        <div class="h-32 w-full max-w-[200px]">
                          <Chart 
@@ -505,17 +505,17 @@
                        </div>
                      </div>
 
-                     <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-800/20">
+                     <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-800/20">
                        <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">IDE focus</p>
                        <p class="mt-1 text-2xl font-bold text-zinc-900 dark:text-white">{activeTeam.reportData.summary.percentInIDE}%</p>
                      </div>
-                     <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-800/20">
+                     <div class="rounded-lg border border-zinc-200 bg-zinc-50/50 p-4 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-800/20">
                        <p class="text-[10px] font-semibold uppercase tracking-wider text-zinc-500 dark:text-zinc-400">App switches</p>
                        <p class="mt-1 text-2xl font-bold text-zinc-900 dark:text-white">{activeTeam.risk.appSwitchCount}</p>
                      </div>
                    </div>
 
-                   <div class="border-l-2 border-zinc-200 pl-4 py-1 dark:border-zinc-800 lg:border-r-0">
+                   <div class="border-l-2 border-zinc-200 pl-4 py-1 dark:border-zinc-800 xl:border-r-0">
                      <p class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Risk flags</p>
                      <div class="flex flex-wrap gap-2">
                        {#if activeTeam.risk.flags.length}
@@ -528,7 +528,7 @@
                      </div>
                    </div>
 
-                   <div class="border-l-2 border-zinc-200 pl-4 py-1 dark:border-zinc-800 lg:border-r-0">
+                   <div class="border-l-2 border-zinc-200 pl-4 py-1 dark:border-zinc-800 xl:border-r-0">
                      <p class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-2">Top applications</p>
                      
                      {#if activeTeam.reportData.appUsage.length}
@@ -568,7 +568,7 @@
                        
                        <div class="space-y-1.5">
                          {#each activeTeam.reportData.appUsage.slice(0, 5) as app}
-                           <div class="flex items-center justify-between border-b border-zinc-100 py-2 dark:border-zinc-800 lg:border-r-0/60">
+                           <div class="flex items-center justify-between border-b border-zinc-100 py-2 dark:border-zinc-800 xl:border-r-0/60">
                              <div class="flex items-center gap-2">
                                <div class="w-2 h-2 rounded-full" style="background-color: {['#4f46e5', '#ec4899', '#f59e0b', '#10b981', '#6366f1'][activeTeam.reportData.appUsage.indexOf(app) % 5]}"></div>
                                <span class="text-xs font-medium text-zinc-700 dark:text-zinc-300">{app.appName}</span>
@@ -582,7 +582,7 @@
                      {/if}
                    </div>
 
-                   <div class="relative border-l-2 border-zinc-200 pl-6 py-2 dark:border-zinc-800 lg:border-r-0 ml-2">
+                   <div class="relative border-l-2 border-zinc-200 pl-6 py-2 dark:border-zinc-800 xl:border-r-0 ml-2">
                      <div class="absolute -left-[5px] top-3 w-2 h-2 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
                      <p class="text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:text-zinc-400 mb-4">Recent activity events</p>
                      
@@ -591,7 +591,7 @@
                          {#each [...(activeTeam.syncData.activityEvents || [])].slice(-6).reverse() as event}
                            <div class="relative group">
                              <div class="absolute -left-[31px] mt-1.5 w-[7px] h-[7px] rounded-full {event.type === 'app_switch' || event.type === 'app_blur' ? 'bg-amber-400' : event.type.includes('paste') ? 'bg-red-400' : 'bg-indigo-400'} ring-4 ring-white dark:ring-zinc-900 transition-transform group-hover:scale-125"></div>
-                             <div class="rounded-lg border border-zinc-100 bg-white p-3 shadow-xs dark:border-zinc-800 lg:border-r-0/60 dark:bg-zinc-900/50 transition-all hover:border-zinc-200 dark:hover:border-zinc-700 hover:shadow-sm">
+                             <div class="rounded-lg border border-zinc-100 bg-white p-3 shadow-xs dark:border-zinc-800 xl:border-r-0/60 dark:bg-zinc-900/50 transition-all hover:border-zinc-200 dark:hover:border-zinc-700 hover:shadow-sm">
                                <div class="flex items-center justify-between gap-4 mb-1.5">
                                  <p class="text-xs font-bold text-zinc-800 dark:text-zinc-200 flex items-center gap-1.5">
                                    {#if event.type === 'app_switch' || event.type === 'app_blur'}
@@ -614,7 +614,7 @@
                            </div>
                          {/each}
                        {:else}
-                         <div class="rounded-lg border border-dashed border-zinc-200 px-4 py-6 text-center dark:border-zinc-800 lg:border-r-0">
+                         <div class="rounded-lg border border-dashed border-zinc-200 px-4 py-6 text-center dark:border-zinc-800 xl:border-r-0">
                            <p class="text-xs text-zinc-400 dark:text-zinc-500 italic">No event timeline available from the latest snapshot.</p>
                          </div>
                        {/if}
@@ -628,7 +628,7 @@
                {/if}
              </div>
              
-             <div class="border-t border-zinc-200 dark:border-zinc-800 lg:border-r-0 p-5 bg-zinc-50 dark:bg-zinc-900/80 sticky bottom-0 z-10 flex gap-3 sm:hidden">
+             <div class="border-t border-zinc-200 dark:border-zinc-800 xl:border-r-0 p-5 bg-zinc-50 dark:bg-zinc-900/80 sticky bottom-0 z-10 flex gap-3 sm:hidden">
                 <button
                   type="button"
                   onclick={closeDrawer}

@@ -81,7 +81,7 @@
 <div class="flex h-screen w-full overflow-hidden font-sans text-zinc-900 dark:text-zinc-100 bg-[#fbfbfb] dark:bg-[#09090b]" style="--sidebar-width: {isSidebarCollapsed ? '88px' : '260px'};">
 
   <!-- Mobile Header -->
-  <div class="flex h-[60px] items-center justify-between border-b border-zinc-200 bg-white px-5 dark:border-zinc-800 dark:bg-zinc-900 lg:hidden shrink-0 w-full fixed top-0 z-40 shadow-sm">
+  <div class="flex h-[60px] items-center justify-between border-b border-zinc-200 bg-white px-5 dark:border-zinc-800 dark:bg-zinc-900 xl:hidden shrink-0 w-full fixed top-0 z-40 shadow-sm">
     <a href="/" title="Back to Main Site" class="flex items-center space-x-[8px] text-[16px] font-bold">
       <img src="/favicon.png" alt="Sonar Logo" class="h-[24px] w-[24px] object-contain" />
       <span class="text-zinc-900 dark:text-white font-semibold tracking-wide">Sonar Host</span>
@@ -100,10 +100,10 @@
 
   <!-- Sidebar Container -->
   <aside
-    class={`fixed inset-y-0 left-0 z-50 flex flex-col bg-[#fbfbfb] dark:bg-[#09090b] transition-all duration-300 ease-in-out text-zinc-600 dark:text-zinc-400 lg:static lg:translate-x-0 ${isMobileSidebarOpen ? "translate-x-0 w-64 border-r border-zinc-200 dark:border-zinc-800/60 shadow-2xl" : "-translate-x-full lg:translate-x-0"} ${isSidebarCollapsed ? "lg:w-[88px]" : "lg:w-[260px]"}`}
+    class={`fixed inset-y-0 left-0 z-50 flex flex-col bg-[#fbfbfb] dark:bg-[#09090b] transition-all duration-300 ease-in-out text-zinc-600 dark:text-zinc-400 xl:static xl:translate-x-0 ${isMobileSidebarOpen ? "translate-x-0 w-64 border-r border-zinc-200 dark:border-zinc-800/60 shadow-2xl" : "-translate-x-full xl:translate-x-0"} ${isSidebarCollapsed ? "xl:w-[88px]" : "xl:w-[260px]"}`}
   >
     <!-- Logo area -->
-    <div class={`flex shrink-0 items-center hidden lg:flex ${isSidebarCollapsed ? "flex-col pt-8 pb-4 space-y-6 px-0" : "h-[88px] px-6 justify-between mt-2"}`}>
+    <div class={`flex shrink-0 items-center hidden xl:flex ${isSidebarCollapsed ? "flex-col pt-8 pb-4 space-y-6 px-0" : "h-[88px] px-6 justify-between mt-2"}`}>
       <a href="/" class="flex items-center space-x-[10px] text-[16px]" title="Back to Main Site">
         <img src="/favicon.png" alt="Sonar Logo" class="h-[26px] w-[26px] object-contain shrink-0" />
         {#if !isSidebarCollapsed}
@@ -129,7 +129,7 @@
     </div>
 
     <!-- Mobile-only controls matching desktop theme -->
-    <div class="flex items-center p-5 lg:hidden border-b border-zinc-200 dark:border-zinc-800">
+    <div class="flex items-center p-5 xl:hidden border-b border-zinc-200 dark:border-zinc-800">
       <ThemeToggle />
     </div>
 
@@ -174,7 +174,7 @@
   <!-- Overlay for mobile sidebar -->
   {#if isMobileSidebarOpen}
     <div
-      class="fixed inset-0 z-40 bg-zinc-900/20 backdrop-blur-sm lg:hidden transition-opacity"
+      class="fixed inset-0 z-40 bg-zinc-900/20 backdrop-blur-sm xl:hidden transition-opacity"
       onclick={toggleMobileSidebar}
       onkeydown={(e) => {if(e.key === 'Escape') toggleMobileSidebar()}}
       role="button"
@@ -184,7 +184,7 @@
   {/if}
 
   <!-- Main Content Area -->
-  <main bind:this={contentScrollContainer} class="flex flex-1 flex-col overflow-y-auto z-10 pt-[60px] lg:pt-0 custom-scrollbar bg-white dark:bg-zinc-900 lg:my-3 lg:rounded-l-[32px] shadow-[0_2px_20px_-8px_rgba(0,0,0,0.05)] border border-zinc-200 lg:border-r-0 dark:border-zinc-800">
+  <main bind:this={contentScrollContainer} class="flex flex-1 flex-col overflow-y-auto z-10 pt-[60px] xl:pt-0 custom-scrollbar bg-white dark:bg-zinc-900 xl:my-3 xl:rounded-l-[32px] shadow-[0_2px_20px_-8px_rgba(0,0,0,0.05)] border border-zinc-200 xl:border-r-0 dark:border-zinc-800">
     <ErrorBoundary>
       {@render children()}
     </ErrorBoundary>

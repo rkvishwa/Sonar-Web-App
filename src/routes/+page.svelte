@@ -98,7 +98,7 @@
 
 <!-- Hero Section -->
 <section
-  class="relative w-full pt-8 mt-4 sm:pt-12 sm:mt-6 pb-32 sm:pb-40 overflow-hidden min-h-[85vh] flex flex-col items-center justify-start px-4 sm:px-6"
+  class="relative w-full pt-4 mt-2 sm:pt-12 sm:mt-6 pb-16 sm:pb-32 lg:pb-40 overflow-hidden sm:min-h-[85vh] flex flex-col items-center justify-start px-3 sm:px-6"
 >
   <!-- Background grid or mask if any (Disabled to fix hard edge) -->
   <div class="absolute inset-0 z-0 pointer-events-none"></div>
@@ -131,7 +131,7 @@
 
         <!-- Heading -->
         <h1
-          class="text-[clamp(3rem,6vw,5rem)] font-bold tracking-tight leading-[1.1] text-zinc-900 dark:text-white mb-5 hero-stagger-3"
+          class="text-4xl sm:text-[clamp(3rem,6vw,5rem)] font-bold tracking-tight leading-[1.1] text-zinc-900 dark:text-white mb-3 sm:mb-5 hero-stagger-3"
         >
           The open-source IDE built for<br />
           <span class="relative inline-flex items-end whitespace-nowrap">
@@ -147,7 +147,7 @@
 
         <!-- Subtitle -->
         <p
-          class="text-base sm:text-lg text-zinc-500 dark:text-zinc-400 max-w-130 mb-10 leading-relaxed hero-stagger-4"
+          class="text-sm sm:text-lg text-zinc-500 dark:text-zinc-400 max-w-130 mb-6 sm:mb-10 leading-relaxed hero-stagger-4"
         >
           A secure, real-time collaborative coding environment designed
           specifically for supervised exams and technical interviews.
@@ -568,7 +568,7 @@
     onmousemove={handleMouseMove}
     onmouseenter={handleMouseEnter}
     onmouseleave={handleMouseLeave}
-    class="self-center mt-20 sm:mt-28 max-w-4xl w-full relative z-10 group"
+    class="self-center mt-12 sm:mt-28 max-w-4xl w-full relative z-10 group"
     class:animate-float-in={mounted}
   >
     <!-- Magnetic ambient glow (Spotlight aura) -->
@@ -752,15 +752,15 @@
 
 <!-- Stats strip -->
 <section
-  class="relative py-12 border-y border-zinc-100 dark:border-white/4 bg-zinc-50/50 dark:bg-white/1.5"
+  class="relative py-8 sm:py-12 border-y border-zinc-100 dark:border-white/4 bg-zinc-50/50 dark:bg-white/1.5"
 >
-  <div class="container mx-auto px-6">
+  <div class="container mx-auto px-4 sm:px-6">
     <div
       class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto text-center"
     >
       <div>
         <div
-          class="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
+          class="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
         >
           100%
         </div>
@@ -770,7 +770,7 @@
       </div>
       <div>
         <div
-          class="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
+          class="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
         >
           Yjs
         </div>
@@ -780,7 +780,7 @@
       </div>
       <div>
         <div
-          class="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
+          class="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
         >
           Jack
         </div>
@@ -790,7 +790,7 @@
       </div>
       <div>
         <div
-          class="text-3xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
+          class="text-2xl sm:text-4xl font-bold text-zinc-900 dark:text-white mb-1"
         >
           MIT
         </div>

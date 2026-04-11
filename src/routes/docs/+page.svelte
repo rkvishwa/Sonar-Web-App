@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { onMount, tick } from "svelte";
   import {
     Search,
     BookOpen,
@@ -22,7 +22,28 @@
     Database,
     Lock,
     FileText,
+    Github,
   } from "lucide-svelte";
+  import { marked } from "marked";
+
+  let developerDocs: { filename: string, content: string, html: string }[] = $state([]);
+  let activeDevTab = $state("");
+  let isLoadingDocs = $state(true);
+  let hasDocsError = $state(false);
+
+  let repoIssues: any[] = $state([]);
+  let isLoadingIssues = $state(true);
+  let hasIssuesError = $state(false);
+
+  const targetFiles = [
+    'README.md',
+    'SECURITY.md',
+    'CONTRIBUTING.md',
+    'DEVELOPMENT.md',
+    'ARCHITECTURE.md',
+    'APPWRITE.md',
+    'CHANGELOG.md'
+  ];
 
   let activeSection = $state("introduction");
   let searchQuery = $state("");
@@ -71,6 +92,16 @@
         { id: "environment-reference", label: "Environment Reference" },
         { id: "architecture", label: "Architecture" },
       ],
+    },
+    {
+      group: "For Developers",
+      items: [
+        ...targetFiles.map(f => ({
+          id: `dev-${f.replace(/\.md$/i, '').toLowerCase()}`,
+          label: f
+        })),
+        { id: 'dev-issues', label: 'Issues' }
+      ]
     },
   ];
 
@@ -513,7 +544,90 @@
   ];
 
   onMount(() => {
-    const observer = new IntersectionObserver(
+    let observer: IntersectionObserver;
+
+    const fetchDocs = async () => {
+      try {
+        const docsPromises = targetFiles.map(async (filename) => {
+          let response = await fetch(`https://raw.githubusercontent.com/rkvishwa/Sonar-Code-Editor/main/${filename}`);
+          
+          if (!response.ok && response.status === 404) {
+            // Fallback to lowercase if remote repository hasn't been synced with capitalized renames
+            response = await fetch(`https://raw.githubusercontent.com/rkvishwa/Sonar-Code-Editor/main/${filename.toLowerCase()}`);
+          }
+          
+          if (!response.ok) throw new Error(`Failed to fetch ${filename}`);
+          let content = await response.text();
+          
+          // Replace relative markdown images ![alt](relative/path)
+          content = content.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (match, alt, url) => {
+            if (url.startsWith('http') || url.startsWith('data:')) return match;
+            const safeUrl = url.replace(/^\.\//, '').replace(/^\//, '');
+            return `![${alt}](https://raw.githubusercontent.com/rkvishwa/Sonar-Code-Editor/main/${safeUrl})`;
+          });
+
+          // Replace relative HTML images <img src="relative/path">
+          content = content.replace(/<img([^>]*)src=["']([^"']+)["']([^>]*)>/gi, (match, before, src, after) => {
+            if (src.includes('Thesaru-p.png')) {
+              return `<img src="/user/thesaru.png" class="w-10 h-10 object-cover inline-block shrink-0 m-0 align-middle" style="border-radius: 100%;" alt="Thesaru-p" />`;
+            }
+            if (src.startsWith('http') || src.startsWith('data:')) return match;
+            const safeSrc = src.replace(/^\.\//, '').replace(/^\//, '');
+            return `<img${before}src="https://raw.githubusercontent.com/rkvishwa/Sonar-Code-Editor/main/${safeSrc}"${after}>`;
+          });
+
+          return {
+            filename,
+            content,
+            html: await marked.parse(content)
+          };
+        });
+        
+        const loadedDocs = await Promise.all(docsPromises);
+        developerDocs = loadedDocs;
+      } catch (e) {
+        console.error(e);
+        hasDocsError = true;
+      } finally {
+        isLoadingDocs = false;
+      }
+      
+      await tick();
+      if (observer) {
+        developerDocs.forEach(doc => {
+          const el = document.getElementById(`dev-${doc.filename.replace(/\.md$/i, '').toLowerCase()}`);
+          if (el) observer.observe(el);
+        });
+      }
+    };
+
+    const fetchIssues = async () => {
+      try {
+        const res = await fetch('https://api.github.com/repos/rkvishwa/Sonar-Code-Editor/issues?state=open&per_page=15');
+        if (res.ok) {
+          const data = await res.json();
+          repoIssues = data.filter((i: any) => !i.pull_request);
+        } else {
+          hasIssuesError = true;
+        }
+      } catch (e) {
+        console.error("Failed to fetch repository issues:", e);
+        hasIssuesError = true;
+      } finally {
+        isLoadingIssues = false;
+      }
+      
+      await tick();
+      if (observer) {
+        const el = document.getElementById('dev-issues');
+        if (el) observer.observe(el);
+      }
+    };
+
+    fetchDocs();
+    fetchIssues();
+
+    observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
@@ -548,6 +662,26 @@
           .filter((group) => group.items.length > 0)
       : sections,
   );
+
+  $effect(() => {
+    if (activeSection) {
+      const activeLink = document.querySelector(`a[href="#${activeSection}"]`);
+      if (activeLink) {
+        const sidebarContent = activeLink.closest("aside");
+        if (sidebarContent) {
+          const linkRect = activeLink.getBoundingClientRect();
+          const sidebarRect = sidebarContent.getBoundingClientRect();
+
+          if (
+            linkRect.top < sidebarRect.top ||
+            linkRect.bottom > sidebarRect.bottom
+          ) {
+            activeLink.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          }
+        }
+      }
+    }
+  });
 </script>
 
 <svelte:head>
@@ -567,7 +701,7 @@
 </svelte:head>
 
 <div
-  class="px-6 pt-12 pb-12 lg:pt-16 lg:pb-20 max-w-300 mx-auto w-full flex flex-col md:flex-row gap-12 transition-colors duration-200"
+  class="px-4 sm:px-6 pt-6 sm:pt-12 pb-8 sm:pb-12 lg:pt-16 lg:pb-20 max-w-300 mx-auto w-full flex flex-col md:flex-row gap-8 md:gap-12 transition-colors duration-200"
 >
   <aside
     class="hidden md:block w-full md:w-64 shrink-0 font-medium md:sticky top-22 self-start md:max-h-[calc(100vh-6.5rem)] md:overflow-y-auto"
@@ -613,10 +747,10 @@
     </div>
   </aside>
 
-  <main class="flex-1 max-w-3xl space-y-18">
+  <main class="flex-1 max-w-3xl space-y-12 sm:space-y-18">
     <section id="introduction">
       <h1
-        class="text-4xl font-extrabold mb-6 text-zinc-900 dark:text-white tracking-tight"
+        class="text-3xl sm:text-4xl font-extrabold mb-4 sm:mb-6 text-zinc-900 dark:text-white tracking-tight"
       >
         Documentation
       </h1>
@@ -1435,6 +1569,143 @@
             
           </svg>
         </div>
+      </div>
+    </section>
+
+    {#if isLoadingDocs}
+      <section id="developer-docs-loading">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
+            <Github size={22} class="text-blue-600 dark:text-blue-400" />
+            Loading For Developers...
+          </h2>
+        </div>
+        <div class="rounded-2xl border border-zinc-200 bg-white/80 p-6 md:p-8 shadow-sm dark:border-white/8 dark:bg-white/[0.03]">
+          <div class="animate-pulse space-y-4">
+            <div class="h-5 bg-zinc-200 dark:bg-white/10 rounded w-1/3 mb-8"></div>
+            <div class="h-4 bg-zinc-200 dark:bg-white/10 rounded w-full"></div>
+            <div class="h-4 bg-zinc-200 dark:bg-white/10 rounded w-11/12"></div>
+            <div class="h-4 bg-zinc-200 dark:bg-white/10 rounded w-5/6"></div>
+          </div>
+        </div>
+      </section>
+    {:else if hasDocsError}
+      <section id="developer-docs-error">
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
+            <Github size={22} class="text-blue-600 dark:text-blue-400" />
+            For Developers
+          </h2>
+        </div>
+        <div class="rounded-2xl border border-zinc-200 bg-white/80 p-6 md:p-8 shadow-sm dark:border-white/8 dark:bg-white/[0.03] flex flex-col items-center justify-center py-12">
+           <Github class="w-12 h-12 text-zinc-300 dark:text-zinc-600 mb-4" />
+           <p class="text-zinc-500 dark:text-zinc-400">Please check your network connection or the repository URL.</p>
+        </div>
+      </section>
+    {:else}
+      {#each developerDocs as doc}
+        <section id="dev-{doc.filename.replace(/\.md$/i, '').toLowerCase()}">
+          <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
+              <Github size={22} class="text-blue-600 dark:text-blue-400" />
+              {doc.filename}
+            </h2>
+            <a 
+              href="https://github.com/rkvishwa/Sonar-Code-Editor/blob/main/{doc.filename}" 
+              target="_blank"
+              rel="noopener noreferrer"
+              class="text-sm px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 transition-colors flex items-center gap-2 font-medium shrink-0"
+            >
+              <span class="hidden sm:inline">View in GitHub</span>
+              <span class="sm:hidden">GitHub</span>
+              <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+          </div>
+          
+          <div class="rounded-2xl border border-zinc-200 bg-white/80 p-6 md:p-8 shadow-sm dark:border-white/8 dark:bg-white/[0.03]">
+            <div class="prose prose-zinc dark:prose-invert max-w-none prose-sm md:prose-base prose-headings:scroll-mt-24 prose-pre:border prose-pre:border-zinc-200 dark:prose-pre:border-white/10 prose-pre:bg-zinc-50 dark:prose-pre:bg-[#121212] prose-pre:text-zinc-800 dark:prose-pre:text-zinc-200 prose-code:text-zinc-800 dark:prose-code:text-zinc-200 prose-code:bg-zinc-100 dark:prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-img:rounded-xl prose-img:inline-block prose-img:my-1 prose-hr:border-zinc-200 dark:prose-hr:border-white/10 prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50/50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-table:w-full prose-table:border-collapse prose-table:text-sm prose-th:p-3 prose-th:bg-zinc-100 dark:prose-th:bg-white/5 prose-th:text-left prose-td:p-3 prose-td:border-b prose-td:border-zinc-200 dark:prose-td:border-white/10 break-words">
+              {@html doc.html}
+            </div>
+          </div>
+        </section>
+      {/each}
+    {/if}
+
+    <section id="dev-issues">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
+          <Github size={22} class="text-blue-600 dark:text-blue-400" />
+          Repository Issues
+        </h2>
+        <a 
+          href="https://github.com/rkvishwa/Sonar-Code-Editor/issues" 
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-sm px-3 py-1.5 rounded-lg bg-zinc-100 dark:bg-white/5 hover:bg-zinc-200 dark:hover:bg-white/10 text-zinc-700 dark:text-zinc-300 transition-colors flex items-center gap-2 font-medium shrink-0"
+        >
+          <span class="hidden sm:inline">View Options</span>
+          <span class="sm:hidden">GitHub</span>
+          <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+        </a>
+      </div>
+      
+      <div class="rounded-2xl border border-zinc-200 bg-white/80 p-6 shadow-sm dark:border-white/8 dark:bg-white/[0.03]">
+        {#if isLoadingIssues}
+           <div class="animate-pulse space-y-4">
+             {#each Array(3) as _}
+               <div class="h-20 bg-zinc-200 dark:bg-white/5 rounded-xl w-full"></div>
+             {/each}
+           </div>
+        {:else if hasIssuesError}
+           <div class="flex flex-col items-center justify-center py-8">
+             <Github class="w-10 h-10 text-zinc-300 dark:text-zinc-600 mb-4" />
+             <p class="text-zinc-500 dark:text-zinc-400">Unable to load issues from GitHub right now.</p>
+           </div>
+        {:else if repoIssues.length === 0}
+           <div class="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed border-zinc-200 dark:border-white/10 rounded-xl">
+             <div class="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/40 flex items-center justify-center mb-4 text-green-600 dark:text-green-400 font-bold text-2xl">
+               ✓
+             </div>
+             <h3 class="text-lg font-medium text-zinc-900 dark:text-white mb-2">No Open Issues!</h3>
+             <p class="text-zinc-500 dark:text-zinc-400">This repository currently has no open issues. Everything is running smoothly.</p>
+           </div>
+        {:else}
+           <div class="space-y-4">
+             {#each repoIssues as issue}
+                <a href={issue.html_url} target="_blank" class="block p-5 rounded-xl border border-zinc-200 dark:border-white/10 hover:border-blue-500 dark:hover:border-blue-500 hover:shadow-md transition-all bg-white dark:bg-[#18181A] group">
+                  <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+                     <div>
+                       <h3 class="font-semibold text-zinc-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 text-lg transition-colors leading-tight mb-2">
+                         {issue.title}
+                       </h3>
+                       <div class="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-zinc-500 dark:text-zinc-400">
+                         <span class="flex items-center gap-1.5">
+                           <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                           #{issue.number}
+                         </span>
+                         <span class="flex items-center gap-1.5">
+                           <img src={issue.user.avatar_url} alt={issue.user.login} class="w-5 h-5 rounded-full" crossorigin="anonymous" />
+                           {issue.user.login}
+                         </span>
+                         <span>
+                           {new Date(issue.created_at).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                         </span>
+                       </div>
+                     </div>
+                     {#if issue.labels && issue.labels.length > 0}
+                       <div class="flex flex-wrap gap-2 sm:justify-end shrink-0 sm:max-w-[150px]">
+                         {#each issue.labels as label}
+                           <span class="px-2 py-0.5 rounded text-xs font-medium border border-zinc-200 dark:border-white/10 dark:text-zinc-300" style="border-left: 3px solid #{label.color}">
+                             {label.name}
+                           </span>
+                         {/each}
+                       </div>
+                     {/if}
+                  </div>
+                </a>
+             {/each}
+           </div>
+        {/if}
       </div>
     </section>
   </main>

@@ -174,7 +174,7 @@
 {:else}
   <div class="flex flex-col gap-6">
     <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800">
-      <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
         <div class="max-w-3xl">
           <h1 class="text-2xl font-bold text-zinc-900 dark:text-white sm:text-3xl">
             {hackathon?.name || "Unknown hackathon"}
@@ -320,7 +320,7 @@
                {hackathon.startDate ? formatDateTime(hackathon.startDate) : "TBD"} — {hackathon.endDate ? formatDateTime(hackathon.endDate) : "TBD"}
              </p>
           </div>
-          <div class="hidden h-10 w-px bg-zinc-200 dark:bg-zinc-800 lg:block"></div>
+          <div class="hidden h-10 w-px bg-zinc-200 dark:bg-zinc-800 xl:block"></div>
           <div class="flex flex-col gap-1.5">
              <p class="text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">Source</p>
              <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">

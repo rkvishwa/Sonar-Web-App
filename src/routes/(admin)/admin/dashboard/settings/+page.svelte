@@ -249,7 +249,7 @@
       </div>
 
       <!-- Settings body skeleton -->
-      <div class="mt-6 flex flex-col gap-8 md:flex-row lg:mt-8 lg:gap-10">
+      <div class="mt-6 flex flex-col gap-8 md:flex-row xl:mt-8 xl:gap-10">
         <!-- Sidebar skeleton -->
         <aside class="w-full shrink-0 space-y-2 md:w-48">
           {#each Array(3) as _}
@@ -349,7 +349,7 @@
         </div>
       {/if}
 
-      <div class="mt-6 flex flex-col gap-8 md:flex-row lg:mt-8 lg:gap-10">
+      <div class="mt-6 flex flex-col gap-8 md:flex-row xl:mt-8 xl:gap-10">
         <!-- Sidebar Navigation -->
         {#if !searchQuery}
         <aside class="w-full shrink-0 space-y-0.5 border-r border-zinc-100 pr-0 md:w-48 md:pr-6 dark:border-zinc-800/50">

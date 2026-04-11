@@ -166,8 +166,8 @@
   <section class="p-4 pb-20 sm:p-6 lg:p-8">
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
       <!-- Header skeleton -->
-      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 lg:border-r-0">
-        <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 xl:border-r-0">
+        <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <Skeleton variant="text" width="200px" height="28px" />
           <div class="flex gap-3">
             <Skeleton variant="text" width="100px" height="40px" />
@@ -189,8 +189,8 @@
   <section class="p-4 pb-20 sm:p-6 lg:p-8">
     <div class="mx-auto flex w-full max-w-7xl flex-col gap-6">
 
-      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 lg:border-r-0">
-        <div class="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+      <div class="border-b border-zinc-200 pb-8 dark:border-zinc-800 xl:border-r-0">
+        <div class="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
           <div class="max-w-3xl">
             <h1 class="text-2xl font-bold text-zinc-900 dark:text-white sm:text-3xl">
               Hackathons
@@ -319,9 +319,9 @@
           </button>
         </div>
       {:else}
-        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/40 shadow-sm mt-4">
-          <table class="w-full text-left text-sm text-zinc-600 dark:text-zinc-400 whitespace-nowrap lg:whitespace-normal">
-            <thead class="bg-zinc-50/80 border-b border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 lg:border-r-0 dark:bg-zinc-900/60 dark:text-zinc-400">
+        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/40 shadow-sm mt-4">
+          <table class="w-full text-left text-sm text-zinc-600 dark:text-zinc-400 whitespace-nowrap xl:whitespace-normal">
+            <thead class="bg-zinc-50/80 border-b border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/60 dark:text-zinc-400">
               <tr>
                 <th scope="col" class="px-6 py-4">Hackathon</th>
                 <th scope="col" class="px-6 py-4">Status</th>
@@ -397,7 +397,7 @@
       {/if}
 
       {#if isDrawerOpen}
-        <div class="fixed inset-0 z-50 flex items-end lg:left-[var(--sidebar-width,260px)]">
+        <div class="fixed inset-0 z-50 flex items-end xl:left-[var(--sidebar-width,260px)]">
           <!-- Backdrop -->
           <button 
             type="button" 
@@ -411,12 +411,12 @@
           <!-- Drawer panel -->
           <div 
             transition:fly={{ y: 800, duration: 300 }}
-            class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border border-zinc-200 dark:border-zinc-800 lg:border-r-0 border-b-0 flex flex-col h-[85vh] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-0.75rem)] rounded-t-2xl lg:rounded-tl-[24px] lg:rounded-tr-none"
+            class="relative z-50 w-full bg-white dark:bg-zinc-900 shadow-[0_-8px_30px_-15px_rgba(0,0,0,0.3)] overflow-y-auto border border-zinc-200 dark:border-zinc-800 xl:border-r-0 border-b-0 flex flex-col h-[85vh] sm:h-[calc(100vh-4rem)] xl:h-[calc(100vh-0.75rem)] rounded-t-2xl xl:rounded-tl-[24px] xl:rounded-tr-none"
           >
              <div class="sticky top-0 z-20 flex w-full items-center justify-center bg-white pt-2 pb-1 dark:bg-zinc-900">
                <div class="h-1.5 w-12 rounded-full bg-zinc-300 dark:bg-zinc-700"></div>
              </div>
-             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 lg:border-r-0 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10">
+             <div class="flex items-center justify-between border-b border-zinc-200 dark:border-zinc-800 xl:border-r-0 px-6 py-4 bg-white dark:bg-zinc-900 sticky top-7 z-10">
                 <div>
                   <h2 class="text-lg font-bold text-zinc-900 dark:text-white">Create an event workspace</h2>
                   <p class="text-xs text-zinc-500 mt-1 dark:text-zinc-400">Start configuring a new hackathon.</p>
@@ -543,7 +543,7 @@
                 </form>
              </div>
              
-             <div class="border-t border-zinc-200 dark:border-zinc-800 lg:border-r-0 p-5 bg-zinc-50 dark:bg-zinc-900/80 sticky bottom-0 z-10 flex gap-3">
+             <div class="border-t border-zinc-200 dark:border-zinc-800 xl:border-r-0 p-5 bg-zinc-50 dark:bg-zinc-900/80 sticky bottom-0 z-10 flex gap-3">
                 <button
                   type="button"
                   onclick={toggleDrawer}

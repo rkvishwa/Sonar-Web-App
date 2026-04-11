@@ -223,41 +223,46 @@
             <a href="/contact" class={navLinkClass("/contact")}>Contact Us</a>
 
           </nav>
-          <div class="flex items-center gap-3 pt-4 border-t border-cyan-400/20">
-            <ThemeToggle />
-            <a
-              href="https://github.com/rkvishwa/Sonar-Code-Editor"
-              target="_blank"
-              rel="noreferrer"
-              class="rounded-xl border border-cyan-400/38 dark:border-cyan-300/35 bg-white/74 dark:bg-white/10 p-2 text-zinc-700 dark:text-zinc-100/85 hover:text-cyan-700 dark:hover:text-cyan-200 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-colors flex-1 flex justify-center items-center cursor-pointer"
-              aria-label="GitHub Repository"
-            >
-              <Github size={18} />
-            </a>
-            {#if $auth.user}
+          <div class="flex flex-col gap-3 pt-4 border-t border-cyan-400/20">
+            <div class="flex items-center gap-3 w-full">
+              <ThemeToggle />
               <a
-                href="/admin/dashboard"
-                class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                href="https://github.com/rkvishwa/Sonar-Code-Editor"
+                target="_blank"
+                rel="noreferrer"
+                class="rounded-xl border border-cyan-400/38 dark:border-cyan-300/35 bg-white/74 dark:bg-white/10 p-2 text-zinc-700 dark:text-zinc-100/85 hover:text-cyan-700 dark:hover:text-cyan-200 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-colors flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                aria-label="GitHub Repository"
               >
-                <LayoutDashboard size={16} />
-                <span>Dashboard</span>
+                <Github size={18} />
+                <span class="text-sm font-semibold">GitHub</span>
               </a>
-            {:else}
+            </div>
+            <div class="flex items-center gap-3 w-full">
+              {#if $auth.user}
+                <a
+                  href="/admin/dashboard"
+                  class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                >
+                  <LayoutDashboard size={16} />
+                  <span>Dashboard</span>
+                </a>
+              {:else}
+                <a
+                  href="/admin/signin"
+                  class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                >
+                  <LogIn size={16} />
+                  <span>Sign In</span>
+                </a>
+              {/if}
               <a
-                href="/admin/signin"
-                class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                href="/download"
+                class="rounded-full bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all hover:from-cyan-400 hover:to-blue-500 flex-1 flex justify-center items-center gap-2 cursor-pointer"
               >
-                <LogIn size={16} />
-                <span>Sign In</span>
+                <Download size={16} />
+                <span>Download</span>
               </a>
-            {/if}
-            <a
-              href="/download"
-              class="rounded-full bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all hover:from-cyan-400 hover:to-blue-500 flex-1 flex justify-center items-center gap-2 cursor-pointer"
-            >
-              <Download size={16} />
-              <span>Download</span>
-            </a>
+            </div>
           </div>
         </div>
       {/if}
@@ -273,11 +278,11 @@
 
   {#if showMainLayout}
     <footer
-      class="relative z-10 mt-auto border-t border-zinc-200/70 dark:border-white/8 pt-16 pb-8 bg-white/60 dark:bg-[#0d1520]/72 text-zinc-500 dark:text-zinc-400 backdrop-blur-xl transition-colors duration-200"
+      class="relative z-10 mt-auto border-t border-zinc-200/70 dark:border-white/8 pt-8 sm:pt-16 pb-6 sm:pb-8 bg-white/60 dark:bg-[#0d1520]/72 text-zinc-500 dark:text-zinc-400 backdrop-blur-xl transition-colors duration-200"
     >
-      <div class="container mx-auto px-6 max-w-300">
+      <div class="container mx-auto px-4 sm:px-6 max-w-300">
       <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 lg:gap-8 mb-16"
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-8 mb-10 sm:mb-16"
       >
         <div
           class="col-span-1 md:col-span-2 lg:col-span-2 lg:border-r border-zinc-200/70 dark:border-white/8 pr-0 lg:pr-4"

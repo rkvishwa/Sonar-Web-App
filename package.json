@@ -26,9 +26,11 @@
 		"vite": "^7.3.1"
 	},
 	"dependencies": {
+		"@tailwindcss/typography": "^0.5.19",
 		"appwrite": "^24.1.1",
 		"chart.js": "^4.5.1",
 		"clsx": "^2.1.1",
+		"marked": "^18.0.0",
 		"nodemailer": "^8.0.2",
 		"tailwind-merge": "^3.5.0"
 	}

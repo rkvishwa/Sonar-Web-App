@@ -125,7 +125,7 @@
     </div>
 
     <!-- Charts skeleton -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-4">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 mt-4">
       <Skeleton variant="chart" />
       <Skeleton variant="chart" />
     </div>
@@ -197,7 +197,7 @@
     </div>
 
     <!-- Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-4">
+    <div class="grid grid-cols-1 xl:grid-cols-2 gap-12 mt-4">
       <div class="flex flex-col">
         <div class="mb-6 flex items-center justify-between">
           <h3 class="text-base font-semibold text-zinc-900">Risk Distribution</h3>

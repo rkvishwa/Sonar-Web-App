@@ -108,7 +108,7 @@
 </svelte:head>
 
 <div
-  class="px-6 py-20 lg:py-32 max-w-4xl mx-auto w-full text-center transition-colors duration-200"
+  class="px-4 sm:px-6 py-12 sm:py-20 lg:py-32 max-w-4xl mx-auto w-full text-center transition-colors duration-200"
 >
   {#if inviteMode}
     <div class="mb-8 rounded-3xl border border-cyan-200/70 bg-cyan-50/80 p-6 text-left shadow-sm dark:border-cyan-500/20 dark:bg-cyan-500/10">
@@ -176,7 +176,7 @@
   </div>
 
   <h1
-    class="text-4xl sm:text-6xl font-extrabold mb-6 tracking-tight text-zinc-900 dark:text-white"
+    class="text-3xl sm:text-6xl font-extrabold mb-4 sm:mb-6 tracking-tight text-zinc-900 dark:text-white"
   >
     Get Sonar IDE
   </h1>
@@ -186,7 +186,7 @@
   </p>
 
   <div
-    class="bg-white dark:bg-white/2 border border-zinc-200 dark:border-white/5 rounded-3xl p-8 sm:p-12 mb-16 shadow-sm dark:shadow-none transition-colors duration-200"
+    class="bg-white dark:bg-white/2 border border-zinc-200 dark:border-white/5 rounded-3xl p-6 sm:p-12 mb-12 sm:mb-16 shadow-sm dark:shadow-none transition-colors duration-200"
   >
     <div class="flex flex-col items-center justify-center gap-4 mb-12">
       <div class="w-full max-w-2xl flex flex-col gap-6">
@@ -337,9 +337,9 @@
             </div>
 
             <div class="relative z-10 flex items-center gap-3 transition-all duration-300 group-hover:scale-[1.02] text-white dark:text-blue-500 group-hover:text-white dark:group-hover:text-white font-semibold">
-              <img src="/ms-store-white.svg" alt="Microsoft Store" class="w-7 h-7 group-hover:-translate-y-[1px] transition-transform duration-300 block dark:hidden group-hover:!hidden" />
-              <img src="/ms-store-color.svg" alt="Microsoft Store" class="w-6 h-6 group-hover:-translate-y-[1px] transition-transform duration-300 hidden dark:block group-hover:!block" />
-              <span class="text-lg">Download for Windows</span>
+              <img src="/ms-store-white.svg" alt="Microsoft Store" class="w-6 h-6 sm:w-7 sm:h-7 group-hover:-translate-y-[1px] transition-transform duration-300 block dark:hidden group-hover:!hidden" />
+              <img src="/ms-store-color.svg" alt="Microsoft Store" class="w-5 h-5 sm:w-6 sm:h-6 group-hover:-translate-y-[1px] transition-transform duration-300 hidden dark:block group-hover:!block" />
+              <span class="text-base sm:text-lg">Download for Windows</span>
             </div>
           </a>
           <p class="text-xs text-zinc-600 dark:text-zinc-400">
