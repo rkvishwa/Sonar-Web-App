@@ -215,51 +215,51 @@
       </div>
 
       {#if isMobileMenuOpen}
-        <div class="md:hidden border-t border-cyan-400/20 px-4 py-4 space-y-4">
-          <nav class="flex flex-col gap-3 font-semibold text-sm">
+        <div class="md:hidden border-t border-cyan-400/20 px-4 py-3 space-y-3">
+          <nav class="flex flex-col gap-2 font-semibold text-sm">
             <a href="/" class={navLinkClass("/")}>Home</a>
             <a href="/docs" class={navLinkClass("/docs")}>Documentation</a>
             <a href="/about" class={navLinkClass("/about")}>About</a>
             <a href="/contact" class={navLinkClass("/contact")}>Contact Us</a>
 
           </nav>
-          <div class="flex flex-col gap-3 pt-4 border-t border-cyan-400/20">
+          <div class="flex flex-col gap-2.5 pt-3 border-t border-cyan-400/20">
             <div class="flex items-center gap-3 w-full">
               <ThemeToggle />
               <a
                 href="https://github.com/rkvishwa/Sonar-Code-Editor"
                 target="_blank"
                 rel="noreferrer"
-                class="rounded-xl border border-cyan-400/38 dark:border-cyan-300/35 bg-white/74 dark:bg-white/10 p-2 text-zinc-700 dark:text-zinc-100/85 hover:text-cyan-700 dark:hover:text-cyan-200 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-colors flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                class="rounded-xl border border-cyan-400/38 dark:border-cyan-300/35 bg-white/74 dark:bg-white/10 py-1.5 px-2 text-zinc-700 dark:text-zinc-100/85 hover:text-cyan-700 dark:hover:text-cyan-200 hover:bg-cyan-100 dark:hover:bg-cyan-500/20 transition-colors flex-1 flex justify-center items-center gap-2 cursor-pointer"
                 aria-label="GitHub Repository"
               >
-                <Github size={18} />
-                <span class="text-sm font-semibold">GitHub</span>
+                <Github size={16} />
+                <span class="text-[13px] font-semibold">GitHub</span>
               </a>
             </div>
             <div class="flex items-center gap-3 w-full">
               {#if $auth.user}
                 <a
                   href="/admin/dashboard"
-                  class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                  class="rounded-xl bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-3 py-1.5 text-[13px] font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-1.5 cursor-pointer"
                 >
-                  <LayoutDashboard size={16} />
+                  <LayoutDashboard size={14} />
                   <span>Dashboard</span>
                 </a>
               {:else}
                 <a
                   href="/admin/signin"
-                  class="rounded-full bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-4 py-2 text-sm font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                  class="rounded-xl bg-white dark:bg-white/10 border border-cyan-400/30 dark:border-cyan-400/20 px-3 py-1.5 text-[13px] font-semibold text-cyan-700 dark:text-cyan-100 shadow-sm transition-all hover:bg-cyan-50 dark:hover:bg-cyan-500/10 flex-1 flex justify-center items-center gap-1.5 cursor-pointer"
                 >
-                  <LogIn size={16} />
+                  <LogIn size={14} />
                   <span>Sign In</span>
                 </a>
               {/if}
               <a
                 href="/download"
-                class="rounded-full bg-linear-to-r from-cyan-500 to-blue-500 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-cyan-500/30 transition-all hover:from-cyan-400 hover:to-blue-500 flex-1 flex justify-center items-center gap-2 cursor-pointer"
+                class="rounded-xl bg-linear-to-r from-cyan-500 to-blue-500 px-3 py-1.5 text-[13px] font-semibold text-white shadow-sm shadow-cyan-500/30 transition-all hover:from-cyan-400 hover:to-blue-500 flex-1 flex justify-center items-center gap-1.5 cursor-pointer"
               >
-                <Download size={16} />
+                <Download size={14} />
                 <span>Download</span>
               </a>
             </div>
@@ -270,7 +270,7 @@
   </header>
   {/if}
 
-  <main class={`relative z-10 flex-1 flex flex-col ${showMainLayout ? "pt-12" : ""}`}>
+  <main class={`relative z-10 flex-1 flex flex-col ${showMainLayout ? "pt-20 sm:pt-12" : ""}`}>
     <div class="page-load-smooth flex-1 flex flex-col w-full">
       {@render children()}
     </div>

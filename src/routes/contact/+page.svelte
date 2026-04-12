@@ -39,7 +39,7 @@
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
-<div class="relative min-h-[calc(100vh-80px)] overflow-hidden px-6 py-12 sm:py-20 flex flex-col items-center justify-center">
+<div class="relative min-h-[calc(100vh-80px)] overflow-hidden px-4 sm:px-6 md:px-8 py-10 sm:py-16 md:py-20 flex flex-col items-center justify-center">
   <!-- Dynamic Background Ambient Glows -->
   <div class="pointer-events-none absolute left-1/2 top-0 -translate-x-1/2 w-[800px] h-[500px] bg-cyan-500/10 dark:bg-cyan-500/5 blur-[120px] rounded-full mix-blend-screen opacity-50"></div>
   <div class="pointer-events-none absolute left-1/4 bottom-0 w-[600px] h-[400px] bg-blue-500/10 dark:bg-blue-500/5 blur-[100px] rounded-full mix-blend-screen opacity-40"></div>
@@ -85,21 +85,20 @@
         style="background: radial-gradient(600px circle at {mouseX}px {mouseY}px, rgba(34, 211, 238, 0.4), rgba(59, 130, 246, 0.1) 40%, transparent 60%); opacity: {isHovering ? 1 : 0};"
       ></div>
 
-      <!-- Static border gradient behind form -->
       <div
-        class="pointer-events-none absolute -inset-[1px] rounded-[2rem] bg-gradient-to-br from-zinc-200 via-white/10 to-zinc-200/50 dark:from-zinc-700/50 dark:via-white/5 dark:to-zinc-800/50 opacity-80 z-0"
+        class="pointer-events-none absolute -inset-[1px] rounded-[1.5rem] sm:rounded-[2rem] bg-gradient-to-br from-zinc-200 via-white/10 to-zinc-200/50 dark:from-zinc-700/50 dark:via-white/5 dark:to-zinc-800/50 opacity-80 z-0"
       ></div>
 
       <!-- Glassmorphic Form Card -->
       <section
-        class="relative z-10 overflow-hidden rounded-[2rem] border border-white/40 dark:border-white/10 bg-white/60 dark:bg-[#0a121a]/60 p-6 sm:p-10 shadow-2xl shadow-cyan-500/5 backdrop-blur-2xl"
+        class="relative z-10 overflow-hidden rounded-[1.5rem] sm:rounded-[2rem] border border-white/40 dark:border-white/10 bg-white/60 dark:bg-[#0a121a]/60 px-5 py-8 md:p-10 shadow-2xl shadow-cyan-500/5 backdrop-blur-2xl"
       >
         <div
           class="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent"
         ></div>
 
-        <form method="POST" use:enhance class="space-y-6" novalidate>
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <form method="POST" use:enhance class="space-y-5 sm:space-y-6" novalidate>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <!-- Name Input -->
             <div class="space-y-2">
               <label
@@ -209,10 +208,10 @@
           {/if}
 
           <!-- Submit Button -->
-          <div class="pt-2">
+          <div class="pt-1 sm:pt-2">
             <button
               type="submit"
-              class="group relative w-full inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-zinc-900 px-8 py-4 font-bold text-white shadow-[0_4px_14px_0_rgb(0,0,0,0.39)] transition-all hover:shadow-[0_6px_20px_rgba(93,93,93,0.23)] hover:-translate-y-0.5 dark:bg-white dark:text-zinc-900 dark:shadow-[0_4px_14px_0_rgb(255,255,255,0.2)] dark:hover:shadow-[0_6px_20px_rgba(255,255,255,0.23)]"
+              class="group relative w-full inline-flex items-center justify-center gap-2 overflow-hidden rounded-xl bg-zinc-900 px-6 py-3.5 sm:px-8 sm:py-4 font-bold text-white shadow-[0_4px_14px_0_rgb(0,0,0,0.39)] transition-all hover:shadow-[0_6px_20px_rgba(93,93,93,0.23)] hover:-translate-y-0.5 dark:bg-white dark:text-zinc-900 dark:shadow-[0_4px_14px_0_rgb(255,255,255,0.2)] dark:hover:shadow-[0_6px_20px_rgba(255,255,255,0.23)] text-sm sm:text-base"
             >
               <span class="relative z-10 flex items-center gap-2">
                 <span>Send Message</span>

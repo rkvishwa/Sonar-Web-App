@@ -961,21 +961,21 @@
     <div class="relative max-w-5xl mx-auto">
       <div class="relative bg-white dark:bg-[#0a0a0c] rounded-xl overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,0.05)] dark:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.4)] border border-zinc-200/50 dark:border-white/10 w-full group transition-all duration-500">
         <!-- Window header -->
-        <div class="flex items-center px-4 h-12 bg-zinc-50/80 dark:bg-[#121214]/80 border-b border-zinc-100 dark:border-white/5 backdrop-blur-md relative z-10 w-full">
-          <div class="flex gap-2">
+        <div class="flex items-center justify-between px-4 h-12 bg-zinc-50/80 dark:bg-[#121214]/80 border-b border-zinc-100 dark:border-white/5 backdrop-blur-md relative z-10 w-full">
+          <div class="flex gap-2 shrink-0">
             <div class="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-700/80"></div>
             <div class="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-700/80"></div>
             <div class="w-3 h-3 rounded-full bg-zinc-200 dark:bg-zinc-700/80"></div>
           </div>
-          <div class="mx-auto flex items-center gap-2 text-xs font-mono text-zinc-500 uppercase tracking-widest">
-            <Terminal size={14} class="opacity-70" /> CHANGELOG.md
+          <div class="mx-auto flex items-center gap-2 text-xs font-mono text-zinc-500 uppercase tracking-widest truncate max-w-[50%]">
+            <Terminal size={14} class="opacity-70 shrink-0" /> <span class="truncate">CHANGELOG.md</span>
           </div>
-          <div class="w-12"></div>
+          <div class="w-12 shrink-0"></div>
         </div>
         
         <!-- Window content -->
-        <div class="p-6 sm:p-10 font-mono text-sm relative z-10 w-full">
-          <div class="flex flex-col sm:flex-row justify-between items-start gap-8 mb-8 pb-8 border-b border-zinc-100 dark:border-white/5 w-full">
+        <div class="p-4 sm:p-10 font-mono text-sm relative z-10 w-full">
+          <div class="flex flex-col sm:flex-row justify-between items-start gap-6 sm:gap-8 mb-6 sm:mb-8 pb-6 sm:pb-8 border-b border-zinc-100 dark:border-white/5 w-full">
             <div>
               <h3 class="text-3xl sm:text-4xl font-bold tracking-tight mb-4 flex items-center gap-4 flex-wrap whitespace-normal text-zinc-900 dark:text-white font-sans">
                 {data.latestRelease.version}
@@ -998,8 +998,8 @@
           </div>
 
           <!-- Code formatting for changes -->
-          <div class="space-y-4 bg-zinc-50 dark:bg-black/40 p-5 sm:p-6 rounded-xl border border-zinc-100 dark:border-white/5 shadow-inner select-text w-full">
-            <div class="text-zinc-500 dark:text-zinc-400 mb-5 flex items-center gap-2 text-[13px] sm:text-sm">
+          <div class="space-y-4 bg-zinc-50 dark:bg-black/40 p-4 sm:p-6 rounded-xl border border-zinc-100 dark:border-white/5 shadow-inner select-text w-full overflow-x-auto">
+            <div class="text-zinc-500 dark:text-zinc-400 mb-5 flex flex-wrap items-center gap-2 text-[13px] sm:text-sm">
               <span class="text-pink-600 dark:text-pink-400">export const</span> <span class="text-blue-600 dark:text-blue-300">releaseUpdates</span> <span class="text-zinc-400 dark:text-zinc-500">=</span> [
             </div>
             
@@ -1012,7 +1012,7 @@
                   <span class="absolute left-0 sm:left-[-18px] top-2.5 w-3 h-px bg-zinc-300 dark:bg-white/20"></span>
                   <div class="flex items-start text-zinc-700 dark:text-zinc-300 transition-colors w-full">
                     <span class="text-emerald-600 dark:text-emerald-400 mr-2 mt-0.5 opacity-80 select-none">"</span>
-                    <span class="leading-relaxed text-[13px] sm:text-[14px] flex-1">{change}</span>
+                    <span class="leading-relaxed text-[13px] sm:text-[14px] flex-1 min-w-0 break-words">{change}</span>
                     <span class="text-emerald-600 dark:text-emerald-400 ml-1 mt-0.5 opacity-80 select-none">",</span>
                   </div>
                 </li>
@@ -1022,7 +1022,7 @@
                   <span class="absolute left-0 sm:left-[-18px] top-2.5 w-3 h-px bg-zinc-300 dark:bg-white/20"></span>
                   <div class="text-zinc-500 italic flex items-start text-[13px] sm:text-[14px]">
                     <span class="text-emerald-600 dark:text-emerald-400/50 mr-2 select-none">"</span>
-                    <span class="flex-1">Minor system optimizations and security patches</span>
+                    <span class="flex-1 min-w-0 break-words">Minor system optimizations and security patches</span>
                     <span class="text-emerald-600 dark:text-emerald-400/50 ml-1 select-none">",</span>
                   </div>
                 </li>

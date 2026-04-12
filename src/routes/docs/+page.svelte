@@ -576,10 +576,33 @@
             return `<img${before}src="https://raw.githubusercontent.com/rkvishwa/Sonar-Code-Editor/main/${safeSrc}"${after}>`;
           });
 
+          let parsedHtml = await marked.parse(content);
+
+          // Convert standard markdown tables into responsive mobile datalists using `data-label`
+          if (typeof document !== 'undefined') {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(parsedHtml, 'text/html');
+            const tables = doc.querySelectorAll('table');
+            tables.forEach((table) => {
+              table.classList.add('mobile-datalist-table');
+              const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent || '');
+              const rows = table.querySelectorAll('tbody tr');
+              rows.forEach(row => {
+                const cells = row.querySelectorAll('td');
+                cells.forEach((cell, i) => {
+                  if (headers[i]) {
+                    cell.setAttribute('data-label', headers[i]);
+                  }
+                });
+              });
+            });
+            parsedHtml = doc.body.innerHTML;
+          }
+
           return {
             filename,
             content,
-            html: await marked.parse(content)
+            html: parsedHtml
           };
         });
         
@@ -754,7 +777,7 @@
       >
         Documentation
       </h1>
-      <p class="text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6">
+      <p class="text-base sm:text-lg text-zinc-600 dark:text-zinc-400 leading-relaxed mb-6">
         Sonar now spans two closely connected products: the
         <strong> Sonar Code Editor desktop app</strong> for actual coding and
         monitored collaboration, and the <strong>Sonar web app</strong> for
@@ -1474,10 +1497,10 @@
       
       <div class="mt-8 rounded-2xl border border-zinc-200 bg-white/80 p-4 sm:p-6 shadow-sm overflow-x-auto dark:border-white/8 dark:bg-white/[0.03]">
         <h3 class="text-sm font-semibold text-zinc-900 dark:text-white mb-4">
-          Complex Architecture Model
+          Architecture Model
         </h3>
-        <div class="min-w-[700px] w-full flex justify-center py-4">
-          <svg viewBox="120 20 720 480" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto font-sans max-w-full scale-105 transform origin-center">
+        <div class="min-w-[700px] max-w-3xl mx-auto py-4">
+          <svg viewBox="120 20 720 480" xmlns="http://www.w3.org/2000/svg" class="w-full h-auto font-sans">
             <defs>
               <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
                 <path d="M 0 0 L 10 5 L 0 10 z" class="fill-zinc-400 dark:fill-zinc-500" />
@@ -1574,13 +1597,13 @@
 
     {#if isLoadingDocs}
       <section id="developer-docs-loading">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
-            <Github size={22} class="text-blue-600 dark:text-blue-400" />
-            Loading For Developers...
+        <div class="flex items-center justify-between gap-4 mb-6">
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3 min-w-0">
+            <Github size={22} class="text-blue-600 dark:text-blue-400 shrink-0" />
+            <span class="truncate">Loading For Developers...</span>
           </h2>
         </div>
-        <div class="rounded-2xl border border-zinc-200 bg-white/80 p-6 md:p-8 shadow-sm dark:border-white/8 dark:bg-white/[0.03]">
+        <div class="rounded-2xl border border-zinc-200 bg-white/80 p-4 sm:p-6 md:p-8 shadow-sm overflow-hidden dark:border-white/8 dark:bg-white/[0.03]">
           <div class="animate-pulse space-y-4">
             <div class="h-5 bg-zinc-200 dark:bg-white/10 rounded w-1/3 mb-8"></div>
             <div class="h-4 bg-zinc-200 dark:bg-white/10 rounded w-full"></div>
@@ -1591,13 +1614,13 @@
       </section>
     {:else if hasDocsError}
       <section id="developer-docs-error">
-        <div class="flex items-center justify-between mb-6">
-          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
-            <Github size={22} class="text-blue-600 dark:text-blue-400" />
-            For Developers
+        <div class="flex items-center justify-between gap-4 mb-6">
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3 min-w-0">
+            <Github size={22} class="text-blue-600 dark:text-blue-400 shrink-0" />
+            <span class="truncate">For Developers</span>
           </h2>
         </div>
-        <div class="rounded-2xl border border-zinc-200 bg-white/80 p-6 md:p-8 shadow-sm dark:border-white/8 dark:bg-white/[0.03] flex flex-col items-center justify-center py-12">
+        <div class="rounded-2xl border border-zinc-200 bg-white/80 p-4 sm:p-6 md:p-8 shadow-sm overflow-hidden dark:border-white/8 dark:bg-white/[0.03] flex flex-col items-center justify-center py-12">
            <Github class="w-12 h-12 text-zinc-300 dark:text-zinc-600 mb-4" />
            <p class="text-zinc-500 dark:text-zinc-400">Please check your network connection or the repository URL.</p>
         </div>
@@ -1605,10 +1628,10 @@
     {:else}
       {#each developerDocs as doc}
         <section id="dev-{doc.filename.replace(/\.md$/i, '').toLowerCase()}">
-          <div class="flex items-center justify-between mb-6">
-            <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
-              <Github size={22} class="text-blue-600 dark:text-blue-400" />
-              {doc.filename}
+          <div class="flex items-center justify-between gap-4 mb-6">
+            <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3 min-w-0">
+              <Github size={22} class="text-blue-600 dark:text-blue-400 shrink-0" />
+              <span class="truncate">{doc.filename}</span>
             </h2>
             <a 
               href="https://github.com/rkvishwa/Sonar-Code-Editor/blob/main/{doc.filename}" 
@@ -1622,8 +1645,8 @@
             </a>
           </div>
           
-          <div class="rounded-2xl border border-zinc-200 bg-white/80 p-6 md:p-8 shadow-sm dark:border-white/8 dark:bg-white/[0.03]">
-            <div class="prose prose-zinc dark:prose-invert max-w-none prose-sm md:prose-base prose-headings:scroll-mt-24 prose-pre:border prose-pre:border-zinc-200 dark:prose-pre:border-white/10 prose-pre:bg-zinc-50 dark:prose-pre:bg-[#121212] prose-pre:text-zinc-800 dark:prose-pre:text-zinc-200 prose-code:text-zinc-800 dark:prose-code:text-zinc-200 prose-code:bg-zinc-100 dark:prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-img:rounded-xl prose-img:inline-block prose-img:my-1 prose-hr:border-zinc-200 dark:prose-hr:border-white/10 prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50/50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-table:w-full prose-table:border-collapse prose-table:text-sm prose-th:p-3 prose-th:bg-zinc-100 dark:prose-th:bg-white/5 prose-th:text-left prose-td:p-3 prose-td:border-b prose-td:border-zinc-200 dark:prose-td:border-white/10 break-words">
+          <div class="rounded-2xl border border-zinc-200 bg-white/80 p-4 sm:p-6 md:p-8 shadow-sm overflow-hidden dark:border-white/8 dark:bg-white/[0.03]">
+            <div class="prose prose-zinc dark:prose-invert max-w-none prose-sm md:prose-base prose-headings:scroll-mt-24 prose-pre:border prose-pre:border-zinc-200 dark:prose-pre:border-white/10 prose-pre:bg-zinc-50 dark:prose-pre:bg-[#121212] prose-pre:text-zinc-800 dark:prose-pre:text-zinc-200 prose-code:text-zinc-800 dark:prose-code:text-zinc-200 prose-code:bg-zinc-100 dark:prose-code:bg-white/10 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-medium prose-code:before:content-none prose-code:after:content-none prose-a:text-blue-600 dark:prose-a:text-blue-400 prose-img:rounded-xl prose-img:inline-block prose-img:my-1 prose-img:max-w-full prose-hr:border-zinc-200 dark:prose-hr:border-white/10 prose-blockquote:border-l-blue-500 prose-blockquote:bg-blue-50/50 dark:prose-blockquote:bg-blue-900/10 prose-blockquote:px-4 prose-blockquote:py-1 prose-blockquote:rounded-r-lg prose-blockquote:not-italic prose-table:w-full prose-table:border-collapse prose-table:text-sm prose-th:p-3 prose-th:bg-zinc-100 dark:prose-th:bg-white/5 prose-th:text-left prose-td:p-3 prose-td:border-b prose-td:border-zinc-200 dark:prose-td:border-white/10 break-words prose-a:break-all prose-p:break-words">
               {@html doc.html}
             </div>
           </div>
@@ -1632,10 +1655,10 @@
     {/if}
 
     <section id="dev-issues">
-      <div class="flex items-center justify-between mb-6">
-        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3">
-          <Github size={22} class="text-blue-600 dark:text-blue-400" />
-          Repository Issues
+      <div class="flex items-center justify-between gap-4 mb-6">
+        <h2 class="text-2xl font-bold text-zinc-900 dark:text-white flex items-center gap-3 min-w-0">
+          <Github size={22} class="text-blue-600 dark:text-blue-400 shrink-0" />
+          <span class="truncate">Repository Issues</span>
         </h2>
         <a 
           href="https://github.com/rkvishwa/Sonar-Code-Editor/issues" 
@@ -1649,7 +1672,7 @@
         </a>
       </div>
       
-      <div class="rounded-2xl border border-zinc-200 bg-white/80 p-6 shadow-sm dark:border-white/8 dark:bg-white/[0.03]">
+      <div class="rounded-2xl border border-zinc-200 bg-white/80 p-4 sm:p-6 md:p-8 shadow-sm overflow-hidden dark:border-white/8 dark:bg-white/[0.03]">
         {#if isLoadingIssues}
            <div class="animate-pulse space-y-4">
              {#each Array(3) as _}
@@ -1710,3 +1733,59 @@
     </section>
   </main>
 </div>
+
+<style>
+  /* --- Mobile Datalist Table Styles --- */
+  @media (max-width: 640px) {
+    :global(.prose table.mobile-datalist-table) {
+      display: block;
+      width: 100%;
+    }
+    :global(.prose table.mobile-datalist-table thead) {
+      display: none;
+    }
+    :global(.prose table.mobile-datalist-table tbody) {
+      display: block;
+      width: 100%;
+    }
+    :global(.prose table.mobile-datalist-table tr) {
+      display: block;
+      margin-bottom: 2rem;
+      border: 1px solid #e4e4e7;
+      border-radius: 0.75rem;
+      background-color: #ffffff;
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+      overflow: hidden;
+    }
+    :global(.dark .prose table.mobile-datalist-table tr) {
+      border-color: rgba(255, 255, 255, 0.1);
+      background-color: rgba(255, 255, 255, 0.05);
+      box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.5);
+    }
+    :global(.prose table.mobile-datalist-table td) {
+      display: block;
+      border-bottom: 1px solid #f4f4f5;
+      padding: 1rem 1.25rem !important;
+      text-align: left;
+    }
+    :global(.dark .prose table.mobile-datalist-table td) {
+      border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+    :global(.prose table.mobile-datalist-table td:last-child) {
+      border-bottom: none;
+    }
+    :global(.prose table.mobile-datalist-table td::before) {
+      content: attr(data-label);
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #2563eb;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+    :global(.dark .prose table.mobile-datalist-table td::before) {
+      color: #60a5fa;
+    }
+  }
+</style>
