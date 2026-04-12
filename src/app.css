@@ -143,6 +143,33 @@ label:disabled {
   z-index: 2;
 }
 
+/* ── Dark-mode autofill / focus background fix ───────────────────────────
+   Browsers inject a bright autofill background that ignores CSS background
+   properties. We neutralise it with an inset box-shadow trick.              */
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #09090b inset !important; /* zinc-950 */
+  box-shadow:         0 0 0 1000px #09090b inset !important;
+  -webkit-text-fill-color: #f4f4f5 !important; /* zinc-100 */
+  caret-color: #f4f4f5;
+}
+
+/* For inputs that use zinc-900 background (e.g. search bar) */
+.dark input.autofill-900:-webkit-autofill,
+.dark input.autofill-900:-webkit-autofill:hover,
+.dark input.autofill-900:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px #18181b inset !important; /* zinc-900 */
+  box-shadow:         0 0 0 1000px #18181b inset !important;
+}
+
+/* Prevent focus from flashing a white background on dark inputs / textareas */
+.dark input:focus,
+.dark textarea:focus {
+  background-color: inherit;
+}
+
 /* Hide scrollbars globally but keep scroll functionality */
 * {
   scrollbar-width: none; /* Firefox */

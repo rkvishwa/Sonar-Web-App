@@ -367,7 +367,7 @@
                         bind:value={hackathonEditor.description}
                         rows="3"
                         placeholder="Describe the purpose of this hackathon..."
-                        class="block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-white"
+                        class="block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-zinc-900 placeholder:text-zinc-400 focus:border-indigo-500 focus:bg-white focus:outline-none focus:ring-1 focus:ring-indigo-500 sm:text-sm dark:border-zinc-700 dark:bg-zinc-950 dark:text-white dark:placeholder:text-zinc-600 dark:focus:bg-zinc-950 resize-none"
                       ></textarea>
                     </label>
 

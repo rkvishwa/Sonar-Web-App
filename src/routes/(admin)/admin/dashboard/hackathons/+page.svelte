@@ -509,7 +509,7 @@
                         bind:value={newHackathon.description}
                         rows="3"
                         placeholder="Brief notes for organizers, judges, or proctors"
-                        class="w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 resize-none"
+                        class="w-full rounded-md border border-zinc-200 bg-zinc-50 px-3 py-2 text-sm text-zinc-900 outline-none transition-colors focus:border-indigo-500 focus:bg-white focus:ring-2 focus:ring-indigo-500/20 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-100 dark:placeholder:text-zinc-500 dark:focus:bg-zinc-800 resize-none"
                       ></textarea>
                     </label>
                   </div>
@@ -535,21 +535,45 @@
                   </div>
 
                   <div class="flex flex-col space-y-3 pt-2">
-                    <label class="flex items-center justify-between rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700 cursor-pointer">
+                    <div class="flex items-center justify-between rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700">
                       <span>
                         <span class="block text-sm font-semibold text-zinc-800 dark:text-zinc-200">Block internet</span>
                         <span class="text-xs text-zinc-500 dark:text-zinc-400">Copied from global defaults</span>
                       </span>
-                      <input bind:checked={newHackathon.settings.blockInternetAccess} type="checkbox" class="h-4 w-4 accent-indigo-600 cursor-pointer" />
-                    </label>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-label="Toggle default internet restriction"
+                        aria-checked={newHackathon.settings.blockInternetAccess}
+                        onclick={() => newHackathon.settings.blockInternetAccess = !newHackathon.settings.blockInternetAccess}
+                        class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 ${newHackathon.settings.blockInternetAccess ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-600'}`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${newHackathon.settings.blockInternetAccess ? 'translate-x-5' : 'translate-x-0'}`}
+                        ></span>
+                      </button>
+                    </div>
 
-                    <label class="flex items-center justify-between rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700 cursor-pointer">
+                    <div class="flex items-center justify-between rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3 transition-colors hover:bg-zinc-100 dark:border-zinc-700 dark:bg-zinc-800 dark:hover:bg-zinc-700">
                       <span>
                         <span class="block text-sm font-semibold text-zinc-800 dark:text-zinc-200">Require empty workspace</span>
                         <span class="text-xs text-zinc-500 dark:text-zinc-400">Copied from global defaults</span>
                       </span>
-                      <input bind:checked={newHackathon.settings.blockNonEmptyWorkspace} type="checkbox" class="h-4 w-4 accent-indigo-600 cursor-pointer" />
-                    </label>
+                      <button
+                        type="button"
+                        role="switch"
+                        aria-label="Toggle default empty workspace restriction"
+                        aria-checked={newHackathon.settings.blockNonEmptyWorkspace}
+                        onclick={() => newHackathon.settings.blockNonEmptyWorkspace = !newHackathon.settings.blockNonEmptyWorkspace}
+                        class={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2 dark:focus:ring-offset-zinc-800 ${newHackathon.settings.blockNonEmptyWorkspace ? 'bg-indigo-600' : 'bg-zinc-300 dark:bg-zinc-600'}`}
+                      >
+                        <span
+                          aria-hidden="true"
+                          class={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${newHackathon.settings.blockNonEmptyWorkspace ? 'translate-x-5' : 'translate-x-0'}`}
+                        ></span>
+                      </button>
+                    </div>
                   </div>
 
                   <div class="rounded-lg border border-dashed border-zinc-300 bg-zinc-50 px-4 py-3 text-[11px] leading-5 text-zinc-500 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
