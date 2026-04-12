@@ -221,7 +221,7 @@
         </div>
       </div>
 
-      <div class="flex flex-col sm:flex-row gap-4 mb-2">
+      <div class="flex flex-col md:flex-row gap-4 mb-2">
         <div class="relative flex-[2]">
           <Search size={16} class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
           <input
@@ -231,8 +231,8 @@
             class="w-full pl-9 pr-4 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm text-zinc-900 dark:text-zinc-100 transition-shadow"
           />
         </div>
-        <div class="flex gap-2 flex-[1.5]">
-          <div class="relative w-full min-w-[100px]">
+        <div class="flex flex-col sm:flex-row gap-2 flex-[1.5]">
+          <div class="relative w-full">
             <select
               bind:value={statusFilter}
               class="w-full px-3 py-2 border border-zinc-300 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 text-sm text-zinc-900 dark:text-zinc-100 transition-shadow appearance-none cursor-pointer"
@@ -319,9 +319,9 @@
           </button>
         </div>
       {:else}
-        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/40 shadow-sm mt-4">
-          <table class="w-full text-left text-sm text-zinc-600 dark:text-zinc-400 whitespace-nowrap xl:whitespace-normal">
-            <thead class="bg-zinc-50/80 border-b border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/60 dark:text-zinc-400">
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/40 shadow-sm mt-4">
+          <table class="block md:table w-full text-left text-sm text-zinc-600 dark:text-zinc-400">
+            <thead class="hidden md:table-header-group bg-zinc-50/80 border-b border-zinc-200 text-[11px] font-bold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/60 dark:text-zinc-400">
               <tr>
                 <th scope="col" class="px-6 py-4">Hackathon</th>
                 <th scope="col" class="px-6 py-4">Status</th>
@@ -330,17 +330,29 @@
                 <th scope="col" class="px-6 py-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tbody class="block md:table-row-group divide-y divide-zinc-200 dark:divide-zinc-800">
               {#each filteredHackathons as entry}
-                <tr class="transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/60 group/row">
-                  <td class="px-6 py-5 align-middle">
+                <tr class="block md:table-row transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-800/60 group/row p-4 md:p-0">
+                  <td class="block md:table-cell px-2 md:px-6 py-2 md:py-5 align-middle">
                     <div class="font-bold text-zinc-900 dark:text-white text-[15px] mb-1">{entry.name}</div>
                     <div class="flex items-center gap-2 group/id">
                       <div class="text-[11px] font-mono tracking-wider text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-500/10 px-1.5 py-0.5 rounded">{entry.hackathonId}</div>
                       <button 
                         type="button"
                         onclick={() => copyToClipboard(entry.hackathonId)}
-                        class="opacity-0 group-hover/id:opacity-100 transition-opacity p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 cursor-pointer"
+                        class="opacity-0 group-hover/id:opacity-100 transition-opacity p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 cursor-pointer md:block hidden"
+                        title="Copy ID"
+                      >
+                        {#if copiedId === entry.hackathonId}
+                          <Check size={12} class="text-emerald-500" />
+                        {:else}
+                          <Copy size={12} />
+                        {/if}
+                      </button>
+                      <button 
+                        type="button"
+                        onclick={() => copyToClipboard(entry.hackathonId)}
+                        class="p-1 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded text-zinc-400 hover:text-zinc-600 dark:text-zinc-500 dark:hover:text-zinc-300 cursor-pointer block md:hidden"
                         title="Copy ID"
                       >
                         {#if copiedId === entry.hackathonId}
@@ -351,7 +363,8 @@
                       </button>
                     </div>
                   </td>
-                  <td class="px-6 py-5 align-middle">
+                  <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-5 align-middle">
+                    <span class="md:hidden text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Status</span>
                     <span class={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${
                       entry.status === "live"
                         ? "border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-900/50 dark:bg-emerald-950/40 dark:text-emerald-400"
@@ -369,14 +382,16 @@
                       {entry.status}
                     </span>
                   </td>
-                  <td class="px-6 py-5 align-middle">
+                  <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-5 align-middle">
+                    <span class="md:hidden text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Start</span>
                     <span class="text-[13px] font-medium text-zinc-900 dark:text-zinc-100">{entry.startDate ? formatDateTime(entry.startDate) : "—"}</span>
                   </td>
-                  <td class="px-6 py-5 align-middle">
+                  <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-5 align-middle">
+                    <span class="md:hidden text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">End</span>
                     <span class="text-[13px] font-medium text-zinc-900 dark:text-zinc-100">{entry.endDate ? formatDateTime(entry.endDate) : "—"}</span>
                   </td>
-                  <td class="px-6 py-5 text-right align-middle">
-                    <div class="flex items-center justify-end gap-2">
+                  <td class="flex justify-start md:justify-end md:table-cell px-2 md:px-6 py-4 md:py-5 align-middle mt-2 md:mt-0 border-t border-zinc-100 dark:border-zinc-800/50 md:border-0">
+                    <div class="flex items-center justify-start md:justify-end gap-2 w-full">
                       <a href={buildHackathonRoute(entry.hackathonId)} class="inline-flex items-center justify-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-700 dark:text-zinc-200 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 shadow-sm" title="Overview">
                         <Eye size={14} class="text-zinc-400" />
                         Overview

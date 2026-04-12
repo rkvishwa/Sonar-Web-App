@@ -294,9 +294,9 @@
           </div>
         </div>
 
-        <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white/50 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50 shadow-sm">
-          <table class="min-w-full text-left">
-            <thead>
+        <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white/50 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50 shadow-sm">
+          <table class="block md:table min-w-full text-left">
+            <thead class="hidden md:table-header-group">
               <tr class="bg-zinc-50 border-b border-zinc-200 text-xs font-semibold uppercase tracking-wider text-zinc-500 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/80 dark:text-zinc-400">
                 <th class="px-6 py-4">Team</th>
                 <th class="px-6 py-4">Status</th>
@@ -305,11 +305,11 @@
                 <th class="px-3 py-4 text-right">Risk</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tbody class="block md:table-row-group divide-y divide-zinc-200 dark:divide-zinc-800">
               {#if filteredTeams().length}
                 {#each filteredTeams() as entry}
                   <tr
-                    class={`cursor-pointer transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 ${
+                    class={`block md:table-row cursor-pointer transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 p-4 md:p-0 ${
                       selectedTeamId === entry.teamId && isDrawerOpen ? "bg-indigo-50/50 dark:bg-indigo-950/20" : ""
                     }`}
                     onclick={() => {
@@ -317,20 +317,28 @@
                       isDrawerOpen = true;
                     }}
                   >
-                    <td class="px-6 py-4">
+                    <td class="block md:table-cell px-2 md:px-6 py-2 md:py-4">
                       <div>
                         <p class="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{entry.teamName}</p>
                         <p class="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-mono mt-0.5">{entry.teamId}</p>
                       </div>
                     </td>
-                    <td class="px-6 py-4">
+                    <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-4">
+                      <span class="md:hidden text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Status</span>
                       <span class={`rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${statusTone(entry.status)}`}>
                         {entry.status}
                       </span>
                     </td>
-                    <td class="px-6 py-4 text-[13px] text-zinc-500 dark:text-zinc-400">{formatDateTime(entry.lastSeen)}</td>
-                    <td class="px-6 py-4 text-[13px] text-zinc-500 dark:text-zinc-400 font-mono italic max-w-[200px] truncate">{entry.currentFile || "not reporting"}</td>
-                    <td class="px-3 py-4 text-right">
+                    <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-4 text-[13px] text-zinc-500 dark:text-zinc-400">
+                      <span class="md:hidden text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Last seen</span>
+                      {formatDateTime(entry.lastSeen)}
+                    </td>
+                    <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-4 text-[13px] text-zinc-500 dark:text-zinc-400 font-mono italic">
+                      <span class="md:hidden text-[10px] font-bold text-zinc-400 uppercase tracking-wider not-italic font-sans">Current file</span>
+                      <span class="max-w-[200px] truncate block text-right md:text-left">{entry.currentFile || "not reporting"}</span>
+                    </td>
+                    <td class="flex justify-between items-center md:justify-end md:table-cell px-2 md:px-3 py-3 md:py-4 text-right border-t border-zinc-100 dark:border-zinc-800/50 md:border-0 mt-2 md:mt-0">
+                      <span class="md:hidden text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Risk Level</span>
                       <span class={`rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${riskTone(entry.risk.level)}`}>
                         {entry.risk.level} {entry.risk.score}
                       </span>
@@ -338,8 +346,8 @@
                   </tr>
                 {/each}
               {:else}
-                <tr>
-                  <td colspan="5" class="px-6 py-12 text-center text-sm text-zinc-400 dark:text-zinc-500">
+                <tr class="block md:table-row">
+                  <td colspan="5" class="block md:table-cell px-6 py-12 text-center text-sm text-zinc-400 dark:text-zinc-500 border-none">
                     No session data is visible for this hackathon yet.
                   </td>
                 </tr>

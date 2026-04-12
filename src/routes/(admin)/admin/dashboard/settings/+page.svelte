@@ -10,7 +10,10 @@
     Save,
     Search,
     ShieldAlert,
-    Palette
+    Palette,
+    Monitor,
+    Sun,
+    Moon
   } from "lucide-svelte";
   import { updateGlobalSettings } from "$lib/admin/api";
   import {
@@ -490,23 +493,26 @@
                   <button
                     type="button"
                     onclick={() => applyTheme('light')}
-                    class={`flex items-center justify-center gap-3 rounded-lg border bg-white p-4 transition-all hover:bg-zinc-50 ${currentTheme === 'light' ? 'border-indigo-600 ring-2 ring-indigo-600 shadow-sm' : 'border-zinc-200 dark:border-zinc-800 dark:bg-zinc-900/50'}`}
+                    class={`flex items-center justify-center gap-3 rounded-lg border bg-white p-4 transition-all hover:bg-zinc-50 ${currentTheme === 'light' ? 'border-indigo-600 ring-2 ring-indigo-600 text-indigo-600 shadow-sm' : 'border-zinc-200 text-zinc-600 dark:border-zinc-800 dark:bg-zinc-900/50 dark:text-zinc-400'}`}
                   >
-                    <span class="text-sm font-medium text-zinc-900 dark:text-zinc-100">Light</span>
+                    <Sun size={18} />
+                    <span class="text-sm font-medium">Light</span>
                   </button>
                   <button
                     type="button"
                     onclick={() => applyTheme('dark')}
-                    class={`flex items-center justify-center gap-3 rounded-lg border bg-zinc-900 p-4 transition-all hover:bg-zinc-800 ${currentTheme === 'dark' ? 'border-indigo-600 ring-2 ring-indigo-600 shadow-sm' : 'border-zinc-200 dark:border-zinc-800'}`}
+                    class={`flex items-center justify-center gap-3 rounded-lg border bg-zinc-900 p-4 transition-all hover:bg-zinc-800 ${currentTheme === 'dark' ? 'border-indigo-500 ring-2 ring-indigo-500 text-indigo-400 shadow-sm' : 'border-zinc-200 text-zinc-400 dark:border-zinc-800 dark:text-zinc-500'}`}
                   >
-                    <span class="text-sm font-medium text-zinc-100">Dark</span>
+                    <Moon size={18} />
+                    <span class="text-sm font-medium">Dark</span>
                   </button>
                   <button
                     type="button"
                     onclick={() => applyTheme('system')}
-                    class={`flex items-center justify-center gap-3 rounded-lg border bg-gradient-to-br from-white to-zinc-900 p-4 transition-all hover:opacity-90 ${currentTheme === 'system' ? 'border-indigo-600 ring-2 ring-indigo-600 shadow-sm' : 'border-zinc-200 dark:border-zinc-800'}`}
+                    class={`flex items-center justify-center gap-3 rounded-lg border bg-zinc-100 p-4 transition-all hover:bg-zinc-200 dark:bg-zinc-800 dark:hover:bg-zinc-700 ${currentTheme === 'system' ? 'border-indigo-600 ring-2 ring-indigo-600 text-indigo-600 dark:border-indigo-500 dark:ring-indigo-500 dark:text-indigo-400 shadow-sm' : 'border-zinc-200 text-zinc-600 dark:border-zinc-700 dark:text-zinc-400'}`}
                   >
-                    <span class="text-sm font-medium text-zinc-900 drop-shadow-md">System</span>
+                    <Monitor size={18} />
+                    <span class="text-sm font-medium">System</span>
                   </button>
                 </div>
               </div>

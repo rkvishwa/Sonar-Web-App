@@ -347,31 +347,33 @@
             </a>
           </div>
 
-          <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white/30 dark:border-zinc-800 dark:bg-zinc-900/20 shadow-sm">
-            <table class="min-w-full text-left text-sm">
-              <thead class="bg-zinc-50/50 border-b border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 text-zinc-400 uppercase tracking-wider text-[10px] font-bold">
+          <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white/30 dark:border-zinc-800 dark:bg-zinc-900/20 shadow-sm">
+            <table class="block md:table min-w-full text-left text-sm">
+              <thead class="hidden md:table-header-group bg-zinc-50/50 border-b border-zinc-200 dark:bg-zinc-900/50 dark:border-zinc-800 text-zinc-400 uppercase tracking-wider text-[10px] font-bold">
                 <tr>
                   <th class="px-5 py-3">Team Name</th>
                   <th class="px-5 py-3">Status</th>
                   <th class="px-5 py-3 text-right">Risk Level</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+              <tbody class="block md:table-row-group divide-y divide-zinc-200 dark:divide-zinc-800">
                 {#if snapshot.monitors.length}
                 {#each snapshot.monitors.slice(0, 5) as team}
-                  <tr class="transition-colors hover:bg-zinc-50/40 dark:hover:bg-zinc-800/40">
-                    <td class="px-5 py-4">
+                  <tr class="block md:table-row transition-colors p-4 md:p-0 hover:bg-zinc-50/40 dark:hover:bg-zinc-800/40">
+                    <td class="block md:table-cell px-2 md:px-5 py-2 md:py-4">
                       <div>
                         <p class="font-bold text-zinc-900 dark:text-zinc-100">{team.teamName}</p>
                         <p class="text-[10px] text-zinc-400 dark:text-zinc-500 font-mono italic mt-0.5">Seen {formatDateTime(team.lastSeen)}</p>
                       </div>
                     </td>
-                    <td class="px-5 py-4">
+                    <td class="flex justify-between items-center md:table-cell px-2 md:px-5 py-2 md:py-4">
+                      <span class="md:hidden text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Status</span>
                       <span class={`rounded-md border px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide ${statusTone(team.status)}`}>
                         {team.status}
                       </span>
                     </td>
-                    <td class="px-5 py-4 text-right">
+                    <td class="flex justify-between items-center md:table-cell px-2 md:px-5 py-3 md:py-4 text-right border-t border-zinc-100 dark:border-zinc-800/50 md:border-0 mt-2 md:mt-0">
+                      <span class="md:hidden text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Risk Level</span>
                       <span class={`rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide ${riskTone(team.risk.level)}`}>
                         {team.risk.level}
                       </span>
@@ -379,8 +381,8 @@
                   </tr>
                 {/each}
                 {:else}
-                <tr>
-                  <td colspan="3" class="px-5 py-10 text-center text-sm text-zinc-400 dark:text-zinc-500 italic">No telemetry data visible yet.</td>
+                <tr class="block md:table-row">
+                  <td class="block md:table-cell px-5 py-10 text-center text-sm text-zinc-400 dark:text-zinc-500 italic border-none" colspan="3">No telemetry data visible yet.</td>
                 </tr>
                 {/if}
               </tbody>

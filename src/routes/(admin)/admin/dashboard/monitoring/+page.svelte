@@ -308,9 +308,9 @@
             </div>
           </div>
 
-          <div class="overflow-x-auto rounded-xl border border-zinc-200 bg-white/50 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50 shadow-sm">
-            <table class="min-w-full text-left">
-              <thead class="bg-zinc-50/80 border-b border-zinc-200 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/80 tracking-wider font-semibold text-xs text-zinc-500 uppercase">
+          <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white/50 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50 shadow-sm">
+            <table class="block md:table min-w-full text-left">
+              <thead class="hidden md:table-header-group bg-zinc-50/80 border-b border-zinc-200 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/80 tracking-wider font-semibold text-xs text-zinc-500 uppercase">
                 <tr>
                   <th class="px-6 py-4">Team</th>
                   <th class="px-6 py-4">Status</th>
@@ -319,16 +319,16 @@
                   <th class="px-6 py-4 text-right">Risk</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+              <tbody class="block md:table-row-group divide-y divide-zinc-200 dark:divide-zinc-800">
                 {#if filteredTeams().length}
                   {#each filteredTeams() as entry}
                     <tr
-                      class={`cursor-pointer transition-colors hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 ${
+                      class={`block md:table-row cursor-pointer transition-colors p-4 md:p-0 hover:bg-zinc-50/50 dark:hover:bg-zinc-800/40 ${
                         selectedTeamId === entry.teamId ? "bg-indigo-50/30 dark:bg-indigo-950/20" : ""
                       }`}
                       onclick={() => openTeamDetail(entry.teamId)}
                     >
-                      <td class="px-6 py-4 align-top">
+                      <td class="block md:table-cell px-2 md:px-6 py-2 md:py-4 align-top">
                         <div class="space-y-1">
                           <p class="text-sm font-bold text-zinc-900 dark:text-white">{entry.teamName}</p>
                           {#if entry.hackathonId}
@@ -337,14 +337,22 @@
                           <p class="text-xs text-zinc-400 dark:text-zinc-500">{entry.teamId}</p>
                         </div>
                       </td>
-                      <td class="px-6 py-4 align-top">
+                      <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-4 align-top">
+                        <span class="md:hidden text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Status</span>
                         <span class={`rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide inline-block mt-0.5 ${statusTone(entry.status)}`}>
                           {entry.status}
                         </span>
                       </td>
-                      <td class="px-6 py-4 text-[13px] text-zinc-500 dark:text-zinc-400 align-top pt-5">{formatDateTime(entry.lastSeen)}</td>
-                      <td class="px-6 py-4 text-[13px] text-zinc-500 dark:text-zinc-400 align-top pt-5">{entry.currentFile || "Not reported"}</td>
-                      <td class="px-6 py-4 align-top text-right pt-4">
+                      <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-4 text-[13px] text-zinc-500 dark:text-zinc-400 align-top md:pt-5">
+                        <span class="md:hidden text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Last seen</span>
+                        {formatDateTime(entry.lastSeen)}
+                      </td>
+                      <td class="flex justify-between items-center md:table-cell px-2 md:px-6 py-2 md:py-4 text-[13px] text-zinc-500 dark:text-zinc-400 align-top md:pt-5">
+                        <span class="md:hidden text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">File</span>
+                        <span class="truncate max-w-[200px] sm:max-w-xs block text-right md:text-left">{entry.currentFile || "Not reported"}</span>
+                      </td>
+                      <td class="flex justify-between items-center md:justify-end md:table-cell px-2 md:px-6 py-3 md:py-4 align-top text-right md:pt-4 border-t border-zinc-100 dark:border-zinc-800/50 md:border-0 mt-2 md:mt-0">
+                        <span class="md:hidden text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">Risk</span>
                         <span class={`rounded-md border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide inline-block ${riskTone(entry.risk.level)}`}>
                           {entry.risk.level} {entry.risk.score}
                         </span>
@@ -352,8 +360,8 @@
                     </tr>
                   {/each}
                 {:else}
-                  <tr>
-                    <td colspan="5" class="px-6 py-12 text-center text-sm text-zinc-400 dark:text-zinc-500">
+                  <tr class="block md:table-row">
+                    <td colspan="5" class="block md:table-cell px-6 py-12 text-center text-sm text-zinc-400 dark:text-zinc-500 border-none">
                       No session data is visible for the current filters.
                     </td>
                   </tr>
@@ -374,19 +382,19 @@
         </div>
 
         <div class="overflow-hidden rounded-xl border border-zinc-200 bg-white/40 shadow-sm dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/30">
-          <table class="min-w-full text-left text-sm">
-            <thead class="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50 text-zinc-400 uppercase tracking-wider text-[10px] font-bold">
+          <table class="block md:table min-w-full text-left text-sm">
+            <thead class="hidden md:table-header-group border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 xl:border-r-0 dark:bg-zinc-900/50 text-zinc-400 uppercase tracking-wider text-[10px] font-bold">
               <tr>
                 <th class="px-5 py-3">Team & Event</th>
                 <th class="px-5 py-3">Generated</th>
                 <th class="px-5 py-3 text-right">Session Window</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <tbody class="block md:table-row-group divide-y divide-zinc-200 dark:divide-zinc-800">
               {#if filteredReports().length}
                 {#each filteredReports() as report}
-                  <tr class="transition-colors hover:bg-zinc-50/40 dark:hover:bg-zinc-800/40">
-                    <td class="px-5 py-4">
+                  <tr class="block md:table-row transition-colors hover:bg-zinc-50/40 dark:hover:bg-zinc-800/40 p-4 md:p-0">
+                    <td class="block md:table-cell px-2 md:px-5 py-2 md:py-4">
                       <div>
                         <p class="text-sm font-bold text-zinc-900 dark:text-zinc-100">{report.teamName}</p>
                         {#if report.hackathonId}
@@ -394,11 +402,13 @@
                         {/if}
                       </div>
                     </td>
-                    <td class="px-5 py-4 text-xs text-zinc-500 dark:text-zinc-400">
+                    <td class="flex justify-between items-center md:table-cell px-2 md:px-5 py-2 md:py-4 text-xs text-zinc-500 dark:text-zinc-400">
+                      <span class="md:hidden text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Generated</span>
                       {formatDateTime(report.generatedAt)}
                     </td>
-                    <td class="px-5 py-4 text-right">
-                      <div class="text-[11px] text-zinc-400 dark:text-zinc-500 space-y-0.5">
+                    <td class="flex justify-between items-center md:table-cell px-2 md:px-5 py-3 md:py-4 text-right border-t border-zinc-100 dark:border-zinc-800/50 md:border-0 mt-2 md:mt-0">
+                      <span class="md:hidden text-[10px] font-bold text-zinc-400 uppercase tracking-wider">Session Window</span>
+                      <div class="text-[11px] text-zinc-400 dark:text-zinc-500 space-y-0.5 md:text-right text-left ml-auto">
                         <p>Start: {report.sessionStart ? formatDateTime(report.sessionStart) : "N/A"}</p>
                         <p>End: {report.sessionEnd ? formatDateTime(report.sessionEnd) : "N/A"}</p>
                       </div>
@@ -406,8 +416,8 @@
                   </tr>
                 {/each}
               {:else}
-                <tr>
-                  <td colspan="3" class="px-5 py-8 text-center text-sm text-zinc-400 dark:text-zinc-500 italic">
+                <tr class="block md:table-row">
+                  <td colspan="3" class="block md:table-cell px-5 py-8 text-center text-sm text-zinc-400 dark:text-zinc-500 italic border-none">
                     No saved reports are visible yet for the current filter.
                   </td>
                 </tr>
