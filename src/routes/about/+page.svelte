@@ -84,7 +84,7 @@
         <div class="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-zinc-800/10 dark:bg-white/10 text-cyan-600 dark:text-cyan-300 text-xs font-semibold tracking-wider uppercase mb-4 outline outline-1 outline-zinc-900/10 dark:outline-white/10">
           <span>The Community</span>
         </div>
-        <h2 class="text-2xl sm:text-4xl font-extrabold mb-4">Crafted by <span class="text-transparent bg-clip-text bg-linear-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400">knurdz</span></h2>
+        <h2 class="text-2xl sm:text-4xl font-extrabold mb-4">Crafted by <span class="text-transparent bg-clip-text bg-linear-to-r from-cyan-600 to-blue-600 dark:from-cyan-400 dark:to-blue-400">knurdz & Brainvave Software Studios</span></h2>
         <p class="text-zinc-600 dark:text-zinc-400 max-w-lg mb-6 leading-relaxed mx-auto md:mx-0">
           Sonar IDE is proudly developed and maintained by the <strong>knurdz</strong> community. This project is completely open-source, and we welcome contributions from developers worldwide to help build the future of education and coding.
         </p>
