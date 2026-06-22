@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { onMount } from "svelte";
   import { enhance } from "$app/forms";
   import type { ActionData } from "./$types";
   import { Mail, Send, MessageSquare, User, AtSign } from "lucide-svelte";
@@ -9,6 +10,14 @@
   let mouseX = $state(0);
   let mouseY = $state(0);
   let isHovering = $state(false);
+
+  // Layer 3: Timing check — record when the page loaded so the server can
+  // reject submissions that arrive suspiciously fast (i.e. bots).
+  let loadTimestamp = $state("");
+
+  onMount(() => {
+    loadTimestamp = Date.now().toString();
+  });
 
   function handleMouseMove(event: MouseEvent) {
     if (!glowCard) return;
@@ -98,6 +107,14 @@
         ></div>
 
         <form method="POST" use:enhance class="space-y-5 sm:space-y-6" novalidate>
+          <!-- Layer 1: Honeypot — hidden from real users, bots fill it in -->
+          <div aria-hidden="true" style="display:none;">
+            <label for="website">Website (leave blank)</label>
+            <input id="website" name="website" type="text" tabindex="-1" autocomplete="off" />
+          </div>
+
+          <!-- Layer 3: Timestamp — lets the server reject instant (bot) submits -->
+          <input type="hidden" name="_timestamp" value={loadTimestamp} />
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
             <!-- Name Input -->
             <div class="space-y-2">
